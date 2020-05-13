@@ -1,9 +1,9 @@
 import React from 'react';
 import { Row, Col, Input } from 'antd';
-import './EditorComponent.css';
 
 const EditorComponent = props => {
     const codes = props.codes;
+    console.log(codes);
     return (
         <div>
             <Row>
