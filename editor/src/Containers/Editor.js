@@ -51,6 +51,7 @@ class Editor extends Component {
 
     handleKeyDown = (e, idx) => {
         let ctrl = e.currentTarget;
+        console.log(e.key,ctrl.selectionStart, ctrl.selectionEnd)
         if (e.key === 'Backspace' && this.state.codes[idx].length === 0 && this.state.codes.length > 1) {
             //move cursor to prev input when current input is empty
             //ctrl = previous input element
@@ -65,7 +66,7 @@ class Editor extends Component {
             codes.splice(idx, 1);
             this.setState({ codes });
         }
-        if (e.key === 'ArrowDown') {
+        else if (e.key === 'ArrowDown') {
             this.setState({ col: ctrl.selectionEnd });
         }
         else if (e.key === 'ArrowUp') {

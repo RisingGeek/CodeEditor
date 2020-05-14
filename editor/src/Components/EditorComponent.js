@@ -3,7 +3,6 @@ import { Row, Col, Input } from 'antd';
 
 const EditorComponent = props => {
     const codes = props.codes;
-    console.log(codes);
     return (
         <div>
             <Row>
@@ -11,6 +10,7 @@ const EditorComponent = props => {
                     {
                         codes.map((code, idx) => (
                             <Input
+                                key={idx}
                                 type="text"
                                 value={code}
                                 size="small"
