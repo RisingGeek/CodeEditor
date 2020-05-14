@@ -25,7 +25,7 @@ const EditorComponent = props => {
                 <Col span={8}>
                 </Col>
             </Row>
-            <button type="button" style={{ marginTop: '10px' }}> run code</button>
+            <button type="button" style={{ marginTop: '10px' }} onClick={props.handleRun}> run code</button>
         </div>
     );
 }

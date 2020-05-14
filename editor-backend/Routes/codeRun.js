@@ -56,7 +56,7 @@ router.post('/run', (req, res) => {
             Promise.all([delSourceFile, delInputFile, delOutFile]).then(response2 => {
                 if (stderr) {
                     // 400 error status because of bad request(code variable is not valid)
-                    res.status(400).send(stderr);
+                    res.status(400).json(stderr);
                 }
                 else
                     res.send(stdout);

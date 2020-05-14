@@ -1,10 +1,13 @@
 import React, { Component } from 'react';
 import EditorComponent from '../Components/EditorComponent';
+import axios from 'axios';
 
 class Editor extends Component {
     state = {
-        codes: ["#include<iostream>"],
-        col: 0
+        codes: ['#include<iostream>', 'using namespace std;', 'int main(){', 'cout<<"hi";', '}'],
+        col: 0,
+        input: "",
+        output: "",
     }
 
     handleChange = (e, idx) => {
@@ -70,6 +73,28 @@ class Editor extends Component {
         }
     }
 
+    handleRun = () => {
+        // Convert array of codes into a single string
+        let code = "";
+        let codes = [...this.state.codes];
+        for (let str of codes) {
+            // Escape character(double quotes) for JSON
+            // str = str.replace(/"/g,'\\"');
+            code += str + "\n";
+        }
+        console.log(code);
+        // Send API call to run code
+        axios.post('http://localhost:5000/code/run', {
+            code: code,
+            input: this.state.input,
+            id: 123
+        }).then(response => {
+            console.log(response.data);
+        }).catch(err => {
+            console.log(String(err.response.data));
+        })
+    }
+
 
     render() {
 
@@ -79,6 +104,7 @@ class Editor extends Component {
                 handleChange={this.handleChange}
                 handleKeyDown={this.handleKeyDown}
                 handleKeyUp={this.handleKeyUp}
+                handleRun={this.handleRun}
             />
         );
     }
