@@ -2,12 +2,7 @@ const router = require('express').Router();
 const fs = require('fs');
 const { exec } = require('child_process');
 
-router.get('/',(req, res) => {
-    console.log('here');
-    res.send('ok');
-})
 router.post('/run', (req, res) => {
-    console.log('run');
     //req.body items
     let code = req.body.code;
     let input = req.body.input;
