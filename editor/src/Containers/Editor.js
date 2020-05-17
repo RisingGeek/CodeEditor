@@ -12,6 +12,8 @@ const isDev = getEnv();
 const serverURL = isDev ? process.env.REACT_APP_DEV_SERVER_URL : process.env.REACT_APP_PROD_SERVER_URL;
 const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.env.REACT_APP_PROD_WEB_SOCKET_URL;
 
+
+console.log(process.env)
 //open websocket connection to shareDB server
 const rws = new ReconnectingWebSocket(websocketURL);
 const connection = new shareDB.Connection(rws);
