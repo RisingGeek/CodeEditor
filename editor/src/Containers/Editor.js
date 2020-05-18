@@ -12,8 +12,6 @@ const isDev = getEnv();
 const serverURL = isDev ? process.env.REACT_APP_DEV_SERVER_URL : process.env.REACT_APP_PROD_SERVER_URL;
 const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.env.REACT_APP_PROD_WEB_SOCKET_URL;
 
-
-console.log(process.env)
 //open websocket connection to shareDB server
 const rws = new ReconnectingWebSocket(websocketURL);
 const connection = new shareDB.Connection(rws);
@@ -24,9 +22,11 @@ class Editor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            code: '// type some code here',
+            code: '',
             input: '',
             output: '',
+            editor: null,
+            monaco: null
         }
     }
 
@@ -39,17 +39,36 @@ class Editor extends Component {
 
     //populate fields on doc
     showNumbers = () => {
-        this.setState({ code: doc.data.content[0] });
+        if(this.state.output !== doc.data.output[0]) {
+            console.log('here');
+            this.setState({output: doc.data.output[0]});
+        }
+        else if(this.state.input !== doc.data.input[0]) {
+            this.setState({input: doc.data.input[0]});
+        }
+        else {
+            this.setState({ code: doc.data.content[0] }, () => {
+                if(this.state.editor) {
+                    // console.log(this.state.editor.getSelection())
+                    const editor = this.state.editor;
+                    const monaco = this.state.monaco;
+                    const selection = editor.getSelection()
+                    const eln = selection.endLineNumber;
+                    const ec = selection.endColumn;
+                    this.state.editor.setSelection(new this.state.monaco.Range(eln,ec,eln,ec))
+                    this.state.editor.focus()
+                }
+            });
+        }
     }
 
     editorDidMount = (editor, monaco) => {
         editor.focus();
+        this.setState({editor, monaco})
     }
 
     onChange = (newValue, e) => {
-        // console.log(e);
-        // console.log('onchange',{newValue}, {e});
-        doc.submitOp([{ p: ['content',0], ld: this.state.code[0], li: newValue }]); //p: PATH
+        doc.submitOp([{ p: ['content',0], ld: this.state.code, li: newValue }]); //p: PATH
     }
 
     handleRun = () => {
@@ -63,14 +82,16 @@ class Editor extends Component {
             id: 123
         }).then(response => {
             console.log(response.data);
-            this.setState({output: response.data});
+            doc.submitOp([{ p: ['output',0], ld: this.state.output, li: response.data }]); //p: PATH
+            
         }).catch(err => {
             console.log(String(err.response.data));
+            doc.submitOp([{ p: ['output',0], ld: this.state.output, li: String(err.response.data) }]); //p: PATH
         })
     }
 
     handleInputChange = (e) => {
-        this.setState({input: e.target.value});
+        doc.submitOp([{ p: ['input',0], ld: this.state.input, li: e.target.value }]); //p: PATH
     }
 
     render() {
