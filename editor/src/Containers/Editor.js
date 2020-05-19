@@ -6,6 +6,7 @@ import MonacoEditor from 'react-monaco-editor';
 // automatically reconnects if the connection is closed
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
+import StringBinding from './stringBinding';
 import getEnv from '../environment';
 
 const isDev = getEnv();
@@ -26,40 +27,18 @@ class Editor extends Component {
             input: '',
             output: '',
             editor: null,
-            monaco: null
+            monaco: null,
+            binding: null,
         }
     }
 
     componentDidMount() {
-        // subscribe to changes
-        doc.subscribe(this.showNumbers);
-        //when document changes by this client or other or server, update the number on page
-        doc.on('op', this.showNumbers);
-    }
-
-    //populate fields on doc
-    showNumbers = () => {
-        if(this.state.output !== doc.data.output[0]) {
-            console.log('here');
-            this.setState({output: doc.data.output[0]});
-        }
-        else if(this.state.input !== doc.data.input[0]) {
-            this.setState({input: doc.data.input[0]});
-        }
-        else {
-            this.setState({ code: doc.data.content[0] }, () => {
-                if(this.state.editor) {
-                    // console.log(this.state.editor.getSelection())
-                    const editor = this.state.editor;
-                    const monaco = this.state.monaco;
-                    const selection = editor.getSelection()
-                    const eln = selection.endLineNumber;
-                    const ec = selection.endColumn;
-                    this.state.editor.setSelection(new this.state.monaco.Range(eln,ec,eln,ec))
-                    this.state.editor.focus()
-                }
-            });
-        }
+        doc.subscribe((err) => {
+            if (err) throw err;
+            var binding = new StringBinding(this.state.editor, this, doc, ['content']);
+            binding.setup(this);
+            this.setState({binding});
+        });
     }
 
     editorDidMount = (editor, monaco) => {
@@ -68,13 +47,12 @@ class Editor extends Component {
     }
 
     onChange = (newValue, e) => {
-        doc.submitOp([{ p: ['content',0], ld: this.state.code, li: newValue }]); //p: PATH
+        this.state.binding._inputListener(this.state.code, newValue, e);
     }
 
     handleRun = () => {
         // Convert array of codes into a single string
         const code = this.state.code;
-        console.log(code);
         // Send API call to run code
         axios.post(serverURL+'/code/run', {
             code: code,
@@ -95,6 +73,7 @@ class Editor extends Component {
     }
 
     render() {
+        console.log(this.state.code)
         const code = this.state.code;
         const input = this.state.input;
         const output = this.state.output;

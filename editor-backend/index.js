@@ -30,7 +30,7 @@ function createDoc(callback) {
         if (err) throw err;
         // If doc type is null, create a document
         if (doc.type == null) {
-            doc.create({ content: ['// type some code here'], output: [''], input: [''] }, callback);
+            doc.create({ content: ''}, callback);
             return;
         }
         // Start server callback
