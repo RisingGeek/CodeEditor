@@ -1,5 +1,6 @@
-function TextDiffBinding(element) {
+function TextDiffBinding(element, compoThis) {
   this.element = element;
+  this.compoThis = compoThis
 }
 
 TextDiffBinding.prototype._get =
@@ -15,14 +16,14 @@ TextDiffBinding.prototype._getElementValue = function(prevValue, newValue, e) {
 };
 
 TextDiffBinding.prototype._getInputEnd = function(previous, value) {
-  if (this.element !== document.activeElement) return null;
+  // if (this.element !== document.activeElement) return null;
   var end = value.length - this.element.selectionStart;
   if (end === 0) return end;
   if (previous.slice(previous.length - end) !== value.slice(value.length - end)) return null;
   return end;
 };
 
-TextDiffBinding.prototype.onInput = function(prevValue, newValue, e, compoThis) {
+TextDiffBinding.prototype.onInput = function(prevValue, newValue, e) {
   var previous = this._get();
   var value = this._getElementValue(prevValue, newValue, e);
   if (previous === value) return;
@@ -64,8 +65,8 @@ TextDiffBinding.prototype.onInput = function(prevValue, newValue, e, compoThis) 
   }
 };
 
-TextDiffBinding.prototype.onInsert = function(rangeOffset, length, compoThis) {
-  this._transformSelectionAndUpdate(rangeOffset, length, insertCursorTransform, compoThis);
+TextDiffBinding.prototype.onInsert = function(rangeOffset, length) {
+  this._transformSelectionAndUpdate(rangeOffset, length, insertCursorTransform);
 };
 function insertCursorTransform(rangeOffset, length, cursorOffset) {
   //rangeOffset->rangeOffset of editor which actually edited
@@ -73,8 +74,8 @@ function insertCursorTransform(rangeOffset, length, cursorOffset) {
   return (rangeOffset < cursorOffset) ? cursorOffset + length : cursorOffset;
 }
 
-TextDiffBinding.prototype.onRemove = function(rangeOffset, length, compoThis) {
-  this._transformSelectionAndUpdate(rangeOffset, length, removeCursorTransform, compoThis);
+TextDiffBinding.prototype.onRemove = function(rangeOffset, length) {
+  this._transformSelectionAndUpdate(rangeOffset, length, removeCursorTransform);
 };
 function removeCursorTransform(rangeOffset, length, cursorOffset) {
   //rangeOffset->rangeOffset of editor which actually edited
@@ -82,31 +83,27 @@ function removeCursorTransform(rangeOffset, length, cursorOffset) {
   return (rangeOffset < cursorOffset) ? cursorOffset -= Math.min(length, cursorOffset - rangeOffset) : cursorOffset;
 }
 
-TextDiffBinding.prototype._transformSelectionAndUpdate = function(rangeOffset, length, transformCursor, compoThis) {
+TextDiffBinding.prototype._transformSelectionAndUpdate = function(rangeOffset, length, transformCursor) {
     // Todo: Fix cursor position on inserting newline
-    let editor = compoThis.state.editor;
+    let editor = this.compoThis.state.editor;
     console.log('change',rangeOffset)
     console.log(editor.getModel().getOffsetAt(editor.getPosition()))
-    console.log(compoThis.state.editor.getSelection())
+    console.log(this.compoThis.state.editor.getSelection())
     var startOffset = transformCursor(rangeOffset, length, editor.getModel().getOffsetAt(editor.getPosition()));
-
-    // var endOffset = transformCursor(rangeOffset, length, editor.getModel().getOffsetAt(editor.getPosition()));
-    // var selectionDirection = this.element.selectionDirection;
-    this.update(compoThis);
-    // this.element.setSelectionRange(selectionStart, selectionEnd, selectionDirection);
-    editor.setSelection(new compoThis.state.monaco.Range(
+    this.update();
+    editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,)
     );
 };
 
-TextDiffBinding.prototype.update = function(compoThis, isSetup) {
+TextDiffBinding.prototype.update = function(isSetup) {
   var value = this._get();
   if (this._getElementValue() === value) return;
-  compoThis.setState({code:value});
+  this.compoThis.setState({code:value});
 
   if(isSetup) {
-    compoThis.state.editor.setSelection(new compoThis.state.monaco.Range(1,1,1,1));
+    this.compoThis.state.editor.setSelection(new this.compoThis.state.monaco.Range(1,1,1,1));
   }
 };
 
