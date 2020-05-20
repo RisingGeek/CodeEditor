@@ -43,6 +43,7 @@ class Editor extends Component {
 
     editorDidMount = (editor, monaco) => {
         editor.focus();
+        // editor.setSelection(new monaco.Range(1,1,1,1));
         this.setState({editor, monaco})
     }
 
@@ -73,7 +74,6 @@ class Editor extends Component {
     }
 
     render() {
-        console.log(this.state.code)
         const code = this.state.code;
         const input = this.state.input;
         const output = this.state.output;

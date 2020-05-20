@@ -12,7 +12,7 @@ StringBinding.prototype = Object.create(TextDiffBinding.prototype);
 StringBinding.prototype.constructor = StringBinding;
 
 StringBinding.prototype.setup = function(compoThis) {
-  this.update(compoThis);
+  this.update(compoThis, true);
   this.attachDoc(compoThis);
   this.attachElement();
 };
