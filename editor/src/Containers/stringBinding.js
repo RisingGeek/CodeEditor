@@ -55,6 +55,9 @@ StringBinding.prototype._parseInsertOp = function(component) {
   if (!component.si) return;
   var rangeOffset = component.rangeOffset;
   var length = component.si.length;
+  let count = component.si.split("\n").length-1;
+  console.log(count);
+  length += count;
   this.onInsert(rangeOffset, length);
 };
 
@@ -79,14 +82,12 @@ StringBinding.prototype._get = function() {
 };
 
 StringBinding.prototype._insert = function(index, text, rangeOffset) {
-  console.log(text);
   var path = this.path.concat(index);
   var op = {p: path, si: text, rangeOffset: rangeOffset};
   this.doc.submitOp(op, {source: this});
 };
 
 StringBinding.prototype._remove = function(index, text, rangeOffset) {
-  console.log(text);
   var path = this.path.concat(index);
   var op = {p: path, sd: text, rangeOffset: rangeOffset};
   this.doc.submitOp(op, {source: this});

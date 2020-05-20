@@ -24,7 +24,7 @@ TextDiffBinding.prototype._getInputEnd = function(previous, value) {
 };
 
 TextDiffBinding.prototype.onInput = function(prevValue, newValue, e) {
-  var previous = this._get();
+  var previous = this.doc.data.content;
   var value = this._getElementValue(prevValue, newValue, e);
   if (previous === value) return;
 
@@ -86,10 +86,11 @@ function removeCursorTransform(rangeOffset, length, cursorOffset) {
 TextDiffBinding.prototype._transformSelectionAndUpdate = function(rangeOffset, length, transformCursor) {
     // Todo: Fix cursor position on inserting newline
     let editor = this.compoThis.state.editor;
-    console.log('change',rangeOffset)
-    console.log(editor.getModel().getOffsetAt(editor.getPosition()))
+    console.log('change',rangeOffset, editor.getModel().getOffsetAt(editor.getPosition()), length)
     console.log(this.compoThis.state.editor.getSelection())
-    var startOffset = transformCursor(rangeOffset, length, editor.getModel().getOffsetAt(editor.getPosition()));
+    let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
+    var startOffset = transformCursor(rangeOffset, length, cursorOffset);
+    console.log(startOffset)
     this.update();
     editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
