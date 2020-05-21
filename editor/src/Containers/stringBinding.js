@@ -5,6 +5,8 @@ function StringBinding(element, compoThis, doc, path) {
   this.path = path || [];
   this._opListener = null;
   this._inputListener = null;
+  this._outListener = null;
+  this._inListener = null;
   this.compoThis = compoThis || null;
   TextDiffBinding.call(this, element, compoThis);
 }
@@ -26,6 +28,12 @@ StringBinding.prototype.attachElement = function() {
   this._inputListener = function(prevValue, newValue, e) {
     binding.onInput(prevValue, newValue, e);
   };
+  this._outListener = function(before, output) {
+    binding.onOut(before, output);
+  }
+  this._inListener = function(before, input) {
+    binding.onIn(before, input);
+  }
 };
 
 StringBinding.prototype.attachDoc = function() {
@@ -42,8 +50,15 @@ StringBinding.prototype._onOp = function(op, source) {
   if (op.length > 1) {
     throw new Error('Op with multiple components emitted');
   }
+  console.log(op,source);
   var component = op[0];
-  if (isSubpath(this.path, component.p)) {
+  if(component.p[0] === 'output') {
+    this.updateOutput(component.ld, component.li);
+  }
+  else if(component.p[0] === 'input') {
+    this.updateInput(component.ld, component.li);
+  }
+  else if (isSubpath(this.path, component.p)) {
     this._parseInsertOp(component);
     this._parseRemoveOp(component);
   } else if (isSubpath(component.p, this.path)) {
@@ -56,7 +71,7 @@ StringBinding.prototype._parseInsertOp = function(component) {
   var rangeOffset = component.rangeOffset;
   var length = component.si.length;
   let count = component.si.split("\n").length-1;
-  console.log(count);
+  // console.log(count);
   length += count;
   this.onInsert(rangeOffset, length);
 };
@@ -92,6 +107,18 @@ StringBinding.prototype._remove = function(index, text, rangeOffset) {
   var op = {p: path, sd: text, rangeOffset: rangeOffset};
   this.doc.submitOp(op, {source: this});
 };
+
+StringBinding.prototype._insertOut = function(before, output) {
+  let path = ['output',0];
+  let op = {p: path, ld: before, li: output};
+  this.doc.submitOp(op, {source: this});
+}
+
+StringBinding.prototype._insertIn = function(before, input) {
+  let path = ['input',0];
+  let op = {p: path, ld: before, li: input};
+  this.doc.submitOp(op, {source: this});
+}
 
 function isSubpath(path, testPath) {
   for (var i = 0; i < path.length; i++) {

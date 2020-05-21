@@ -53,24 +53,30 @@ class Editor extends Component {
 
     handleRun = () => {
         // Convert array of codes into a single string
-        const code = this.state.code;
+        const code = this.state.editor.getValue();
         // Send API call to run code
         axios.post(serverURL+'/code/run', {
             code: code,
             input: this.state.input,
             id: 123
         }).then(response => {
-            console.log(response.data);
-            doc.submitOp([{ p: ['output',0], ld: this.state.output, li: response.data }]); //p: PATH
+            this.state.binding._outListener(this.state.output, response.data);
+            this.setState({output: response.data});
+            // doc.submitOp([{ p: ['output',0], ld: this.state.output, li: response.data }]); //p: PATH
             
         }).catch(err => {
-            console.log(String(err.response.data));
-            doc.submitOp([{ p: ['output',0], ld: this.state.output, li: String(err.response.data) }]); //p: PATH
+            if(err.response.status === 400) {
+                this.state.binding._outListener(this.state.output, err.response.data);
+                this.setState({output: err.response.data});
+            }
+            
+            // doc.submitOp([{ p: ['output',0], ld: this.state.output, li: String(err.response.data) }]); //p: PATH
         })
     }
 
     handleInputChange = (e) => {
-        doc.submitOp([{ p: ['input',0], ld: this.state.input, li: e.target.value }]); //p: PATH
+        this.state.binding._inListener(this.state.input, e.target.value);
+        this.setState({input: e.target.value});
     }
 
     render() {

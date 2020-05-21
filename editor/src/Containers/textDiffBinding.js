@@ -65,6 +65,14 @@ TextDiffBinding.prototype.onInput = function(prevValue, newValue, e) {
   }
 };
 
+TextDiffBinding.prototype.onOut = function(before, output) {
+  this._insertOut(before, output);
+}
+
+TextDiffBinding.prototype.onIn = function(before, input) {
+  this._insertIn(before, input);
+}
+
 TextDiffBinding.prototype.onInsert = function(rangeOffset, length) {
   this._transformSelectionAndUpdate(rangeOffset, length, insertCursorTransform);
 };
@@ -86,11 +94,11 @@ function removeCursorTransform(rangeOffset, length, cursorOffset) {
 TextDiffBinding.prototype._transformSelectionAndUpdate = function(rangeOffset, length, transformCursor) {
     // Todo: Fix cursor position on inserting newline
     let editor = this.compoThis.state.editor;
-    console.log('change',rangeOffset, editor.getModel().getOffsetAt(editor.getPosition()), length)
-    console.log(this.compoThis.state.editor.getSelection())
+    // console.log('change',rangeOffset, editor.getModel().getOffsetAt(editor.getPosition()), length)
+    // console.log(this.compoThis.state.editor.getSelection())
     let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     var startOffset = transformCursor(rangeOffset, length, cursorOffset);
-    console.log(startOffset)
+    // console.log(startOffset)
     this.update();
     editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
@@ -107,5 +115,17 @@ TextDiffBinding.prototype.update = function(isSetup) {
     this.compoThis.state.editor.setSelection(new this.compoThis.state.monaco.Range(1,1,1,1));
   }
 };
+
+TextDiffBinding.prototype.updateOutput = function(oldOutput, newOutput) {
+  if(oldOutput === newOutput) return;
+  console.log('update');
+  this.compoThis.setState({output: newOutput});
+}
+
+TextDiffBinding.prototype.updateInput = function(oldInput, newInput) {
+  if(oldInput === newInput) return;
+  console.log('update');
+  this.compoThis.setState({input: newInput});
+}
 
 export default TextDiffBinding;
