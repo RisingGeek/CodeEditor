@@ -49,6 +49,7 @@ class Editor extends Component {
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
         this.state.binding._inputListener(this.state.code, newValue, e);
+        this.setState({code:newValue});
     }
 
     // Handler for Run Code button
@@ -84,7 +85,7 @@ class Editor extends Component {
                 input={this.state.input}
                 output={this.state.output}
                 editorDidMount={this.editorDidMount}
-                onChange={this.editorOnChange}
+                editorOnChange={this.editorOnChange}
                 handleRun={this.handleRun}
                 handleInput={this.handleInput}
             />
