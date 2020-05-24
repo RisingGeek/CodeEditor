@@ -129,3 +129,6 @@ TextDiffBinding.prototype.updateInput = function(oldInput, newInput) {
 }
 
 export default TextDiffBinding;
+
+// This code has been modified according to the needs.
+// Original code of StringBinding is present at https://github.com/share/text-diff-binding

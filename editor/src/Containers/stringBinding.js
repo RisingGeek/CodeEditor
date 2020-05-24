@@ -128,3 +128,6 @@ function isSubpath(path, testPath) {
 }
 
 export default StringBinding;
+
+// This code has been modified according to the needs.
+// Original code of StringBinding is present at https://github.com/share/sharedb-string-binding
