@@ -21,9 +21,9 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Operational_transformatio
 ### Completed Features:
    - **Real Time Editing:** Edit code in a real time monaco editor. Input and output are also real time.
    - **Run code:** Run code against a custom test case in currently supported languages.
+   - **Private Channel:** Only the users who have access to the unique URL can edit in the editor.
 
 ### Features ToDo List 
-   - **Private Channel:** Currently, code pair's editor is global. Anyone editing code in the editor will be visible to you. The task is to provide private channel so that users can invite other people by sharing the unique URL. 
    - **Video Calling:** Users can interact via video calling.
    - **Support for more languages:** Code pair currently supports C++ language.
    - **Rich text presence:** Highlight the cursor position of other user.

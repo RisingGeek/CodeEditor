@@ -12,12 +12,6 @@ const isDev = getEnv();
 const serverURL = isDev ? process.env.REACT_APP_DEV_SERVER_URL : process.env.REACT_APP_PROD_SERVER_URL;
 const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.env.REACT_APP_PROD_WEB_SOCKET_URL;
 
-//open websocket connection to shareDB server
-const rws = new ReconnectingWebSocket(websocketURL);
-const connection = new shareDB.Connection(rws);
-//create local doc instance mapped to 'examples' collection document with id 'textarea'
-const doc = connection.get('examples', 'textarea');
-
 class Editor extends Component {
     constructor(props) {
         super(props);
@@ -32,11 +26,24 @@ class Editor extends Component {
     }
 
     componentDidMount() {
-        doc.subscribe((err) => {
-            if (err) throw err;
-            var binding = new StringBinding(this.state.editor, this, doc, ['content']);
-            binding.setup(this);
-            this.setState({ binding });
+        const id = this.props.match.params.id;
+        axios.post(serverURL, {
+            id: id
+        }).then(res => {
+            //open websocket connection to shareDB server
+            const rws = new ReconnectingWebSocket(websocketURL);
+            const connection = new shareDB.Connection(rws);
+            //create local doc instance mapped to 'examples' collection document with id 'textarea'
+            const doc = connection.get('examples', id);
+            
+            doc.subscribe((err) => {
+                if (err) throw err;
+                var binding = new StringBinding(this.state.editor, this, doc, ['content']);
+                binding.setup(this);
+                this.setState({ binding });
+            });
+        }).catch(err => {
+            console.log('some error occured');
         });
     }
 

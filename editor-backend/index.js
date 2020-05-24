@@ -17,40 +17,40 @@ const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 
 // shareDB server instance
 const share = new shareDB();
-createDoc(startServer);
 
-// Create initial document then fire callback
-function createDoc(callback) {
-    const connection = share.connect();
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use('/code', codeRunRouter);
+
+const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
+
+// wss->web socket server
+// listen to incoming websocket
+const wss = new WebSocket.Server({ server: server });
+wss.on('connection', ws => {
+    console.log('connection',ws)
+    const stream = new WebSocketJSONStream(ws);
+    share.listen(stream);
+});
+
+const connection = share.connect();
+
+app.post('/', (req, res) => {
+    let id = req.body.id;
     // doc->shareDB.Doc instance
     // examples-> connection name, textarea-> document id
-    const doc = connection.get('examples', 'textarea');
+    const doc = connection.get('examples', id);
     // Fetch doc
     doc.fetch(err => {
         if (err) throw err;
         // If doc type is null, create a document
         if (doc.type == null) {
-            doc.create({ content: '', output: [], input: []}, callback);
+            doc.create({ content: '', output: [], input: []});
             return;
         }
         // Start server callback
-        callback();
+        // callback();
     });
-}
-
-function startServer() {
-    const app = express();
-    app.use(cors());
-    app.use(bodyParser.json());
-    app.use('/code', codeRunRouter);
-
-    const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
-    // wss->web socket server
-    // listen to incoming websocket
-    const wss = new WebSocket.Server({ server: server });
-    wss.on('connection', ws => {
-        const stream = new WebSocketJSONStream(ws);
-        share.listen(stream);
-    });
-}
+    res.send('Document created successfully');
+});
