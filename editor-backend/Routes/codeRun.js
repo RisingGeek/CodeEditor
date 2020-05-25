@@ -27,7 +27,7 @@ router.post('/run', (req, res) => {
     // Step 2: Execute child process to generate output
     Promise.all([sourceFile, inputFile]).then(response => {
         // exec opens a new terminal and executes the command
-        const command = `g++ ${id}.cpp -o out_${id} && ./out_${id} < ${id}.txt`;
+        const command = `g++ ${id}.cpp -o ${id}.out && ./${id}.out < ${id}.txt`;
         exec(command, (error, stdout, stderr) => {
             // console.log({stdout}, {stderr});
             //Step 3: Delete source, input and out file. 
@@ -47,7 +47,7 @@ router.post('/run', (req, res) => {
                 //out file will not be generated when error occurs.s
                 if (stderr)
                     resolve('No need to delete out file');
-                fs.unlink(`out_${id}`, err => {
+                fs.unlink(`${id}.out`, err => {
                     if (err) reject(err);
                     resolve('Removed out file');
                 });

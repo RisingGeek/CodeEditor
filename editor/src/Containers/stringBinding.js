@@ -20,22 +20,20 @@ class StringBinding extends TextDiffBinding {
   };
 
   attachElement = () => {
-    var binding = this;
     this._inputListener = (prevValue, newValue, e) => {
-      binding.onInput(prevValue, newValue, e);
+      this.onInput(prevValue, newValue, e);
     };
     this._outListener = (before, output) => {
-      binding._insertOut(before, output);
+      this._insertOut(before, output);
     }
     this._inListener = (before, input) => {
-      binding._insertIn(before, input);
+      this._insertIn(before, input);
     }
   };
 
   attachDoc = () => {
-    var binding = this;
     this._opListener = (op, source) => {
-      binding._onOp(op, source);
+      this._onOp(op, source);
     };
     this.doc.on('op', this._opListener);
   };

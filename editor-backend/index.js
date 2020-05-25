@@ -29,7 +29,6 @@ const server = app.listen(PORT, () => console.log(`Server started on port ${PORT
 // listen to incoming websocket
 const wss = new WebSocket.Server({ server: server });
 wss.on('connection', ws => {
-    console.log('connection',ws)
     const stream = new WebSocketJSONStream(ws);
     share.listen(stream);
 });
