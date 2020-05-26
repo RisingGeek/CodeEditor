@@ -67,7 +67,7 @@ class Editor extends Component {
         axios.post(serverURL + '/code/run', {
             code: code,
             input: this.state.input,
-            id: 123
+            id: this.props.match.params.id
         }).then(response => {
             this.state.binding._outListener(this.state.output, response.data);
             this.setState({ output: response.data });

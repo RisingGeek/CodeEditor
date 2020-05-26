@@ -104,11 +104,8 @@ class TextDiffBinding {
   _transformSelectionAndUpdate = (rangeOffset, length, transformCursor) => {
     // Todo: Fix cursor position on inserting newline
     let editor = this.compoThis.state.editor;
-    // console.log('change',rangeOffset, editor.getModel().getOffsetAt(editor.getPosition()), length)
-    // console.log(this.compoThis.state.editor.getSelection())
     let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     var startOffset = transformCursor(rangeOffset, length, cursorOffset);
-    // console.log(startOffset)
     this.update();
     editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
@@ -126,17 +123,16 @@ class TextDiffBinding {
     }
   };
 
-  updateOutput = (oldOutput, newOutput) => {
-    if (oldOutput === newOutput) return;
-    console.log('update');
-    this.compoThis.setState({ output: newOutput });
-  }
-
   updateInput = (oldInput, newInput) => {
     if (oldInput === newInput) return;
-    console.log('update');
     this.compoThis.setState({ input: newInput });
   }
+
+  updateOutput = (oldOutput, newOutput) => {
+    if (oldOutput === newOutput) return;
+    this.compoThis.setState({ output: newOutput });
+  }
+  
 }
 export default TextDiffBinding;
 

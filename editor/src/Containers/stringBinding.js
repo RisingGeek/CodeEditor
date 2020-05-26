@@ -1,16 +1,12 @@
 import TextDiffBinding from './textDiffBinding';
 
 class StringBinding extends TextDiffBinding {
-  constructor(element, compoThis, doc, path) {
-    super(element, compoThis, doc,path);
-    this._opListener = null;
-    this._inputListener = null;
-    this._outListener = null;
-    this._inListener = null;
-  }
-
   setup = () => {
     this.update(true);
+    let state = this.compoThis.state;
+    let docData = this.doc.data;
+    this.updateInput(state.input, docData.input[0]);
+    this.updateOutput(state.output, docData.output[0]);
     this.attachDoc();
     this.attachElement();
   };
@@ -20,25 +16,25 @@ class StringBinding extends TextDiffBinding {
   };
 
   attachElement = () => {
+    // Editor onChange listener
     this._inputListener = (prevValue, newValue, e) => {
       this.onInput(prevValue, newValue, e);
     };
+    // Output onChange listener
     this._outListener = (before, output) => {
       this._insertOut(before, output);
     }
+    // Input onChange listener
     this._inListener = (before, input) => {
       this._insertIn(before, input);
     }
   };
 
   attachDoc = () => {
-    this._opListener = (op, source) => {
-      this._onOp(op, source);
-    };
-    this.doc.on('op', this._opListener);
+    this.doc.on('op', this.onListener);
   };
 
-  _onOp = (op, source) => {
+  onListener = (op, source) => {
     if (source === this) return;
     if (op.length === 0) return;
     if (op.length > 1) {
@@ -65,7 +61,6 @@ class StringBinding extends TextDiffBinding {
     var rangeOffset = component.rangeOffset;
     var length = component.si.length;
     let count = component.si.split("\n").length - 1;
-    // console.log(count);
     length += count;
     this.onInsert(rangeOffset, length);
   };
