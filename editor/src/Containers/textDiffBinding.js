@@ -15,12 +15,6 @@ class TextDiffBinding {
     return value;
   };
 
-  _getElementValue = (prevValue, newValue, e) => {
-    var value = newValue || '';
-    // IE and Opera replace \n with \r\n. Always store strings as \n
-    return value.replace(/\r\n/g, '\n');
-  };
-
   _getInputEnd = (previous, value) => {
     // if (this.element !== document.activeElement) return null;
     var end = value.length - this.element.selectionStart;
@@ -31,7 +25,8 @@ class TextDiffBinding {
 
   onInput = (prevValue, newValue, e) => {
     var previous = this.doc.data.content;
-    var value = this._getElementValue(prevValue, newValue, e);
+    // Monaco Editor considers new line as \r\n.
+    let value = newValue.replace(/\r\n/g, '\n'); 
     if (previous === value) return;
 
     var start = 0;
@@ -96,13 +91,13 @@ class TextDiffBinding {
     this._transformSelectionAndUpdate(rangeOffset, length, this.removeCursorTransform);
   };
   removeCursorTransform = (rangeOffset, length, cursorOffset) => {
-    //rangeOffset->rangeOffset of editor which actually edited
-    //cursorOffset->rangeOffset of my editor
+    // rangeOffset, cursorOffset same as insertCursorTransform()
+    // Taking minimum because if one user deletes text written by other(cursor position), 
+    // cursorOffset will become -ve if we do cursorOffset-length
     return (rangeOffset < cursorOffset) ? cursorOffset -= Math.min(length, cursorOffset - rangeOffset) : cursorOffset;
   }
 
   _transformSelectionAndUpdate = (rangeOffset, length, transformCursor) => {
-    // Todo: Fix cursor position on inserting newline
     let editor = this.compoThis.state.editor;
     let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
     var startOffset = transformCursor(rangeOffset, length, cursorOffset);
@@ -115,10 +110,9 @@ class TextDiffBinding {
 
   update = (isSetup) => {
     var value = this._get();
-    if (this._getElementValue() === value) return;
     this.compoThis.setState({ code: value });
-
     if (isSetup) {
+      // Current cursor position
       this.compoThis.state.editor.setSelection(new this.compoThis.state.monaco.Range(1, 1, 1, 1));
     }
   };
