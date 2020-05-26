@@ -122,16 +122,6 @@ class TextDiffBinding {
       this.compoThis.state.editor.setSelection(new this.compoThis.state.monaco.Range(1, 1, 1, 1));
     }
   };
-
-  updateInput = (oldInput, newInput) => {
-    if (oldInput === newInput) return;
-    this.compoThis.setState({ input: newInput });
-  }
-
-  updateOutput = (oldOutput, newOutput) => {
-    if (oldOutput === newOutput) return;
-    this.compoThis.setState({ output: newOutput });
-  }
   
 }
 export default TextDiffBinding;

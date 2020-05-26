@@ -58,8 +58,9 @@ class StringBinding extends TextDiffBinding {
 
   _parseInsertOp = (component) => {
     if (!component.si) return;
-    var rangeOffset = component.rangeOffset;
-    var length = component.si.length;
+    let rangeOffset = component.rangeOffset;
+    let length = component.si.length;
+    // Count new lines
     let count = component.si.split("\n").length - 1;
     length += count;
     this.onInsert(rangeOffset, length);
@@ -67,8 +68,11 @@ class StringBinding extends TextDiffBinding {
 
   _parseRemoveOp = (component) => {
     if (!component.sd) return;
-    var rangeOffset = component.rangeOffset;
-    var length = component.sd.length;
+    let rangeOffset = component.rangeOffset;
+    let length = component.sd.length;
+    // Count new lines
+    let count = component.sd.split("\n").length - 1;
+    length += count;
     this.onRemove(rangeOffset, length);
   };
 
@@ -94,6 +98,16 @@ class StringBinding extends TextDiffBinding {
       if (testPath[i] !== path[i]) return false;
     }
     return true;
+  }
+
+  updateInput = (oldInput, newInput) => {
+    if (oldInput === newInput) return;
+    this.compoThis.setState({ input: newInput });
+  }
+
+  updateOutput = (oldOutput, newOutput) => {
+    if (oldOutput === newOutput) return;
+    this.compoThis.setState({ output: newOutput });
   }
 }
 
