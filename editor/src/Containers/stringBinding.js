@@ -17,8 +17,8 @@ class StringBinding extends TextDiffBinding {
 
   attachElement = () => {
     // Editor onChange listener
-    this._inputListener = (prevValue, newValue, e) => {
-      this.onInput(prevValue, newValue, e);
+    this._inputListener = (newValue, e) => {
+      this.onInput(newValue, e);
     };
     // Output onChange listener
     this._outListener = (before, output) => {
@@ -60,9 +60,6 @@ class StringBinding extends TextDiffBinding {
     if (!component.si) return;
     let rangeOffset = component.rangeOffset;
     let length = component.si.length;
-    // Count new lines
-    let count = component.si.split("\n").length - 1;
-    length += count;
     this.onInsert(rangeOffset, length);
   };
 
@@ -70,9 +67,6 @@ class StringBinding extends TextDiffBinding {
     if (!component.sd) return;
     let rangeOffset = component.rangeOffset;
     let length = component.sd.length;
-    // Count new lines
-    let count = component.sd.split("\n").length - 1;
-    length += count;
     this.onRemove(rangeOffset, length);
   };
 

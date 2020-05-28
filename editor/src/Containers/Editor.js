@@ -49,13 +49,14 @@ class Editor extends Component {
 
     editorDidMount = (editor, monaco) => {
         editor.focus();
-        // editor.setSelection(new monaco.Range(1,1,1,1));
+        // Set end of line preference
+        editor.getModel().pushEOL(0);
         this.setState({ editor, monaco })
     }
 
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
-        this.state.binding._inputListener(this.state.code, newValue, e);
+        this.state.binding._inputListener(newValue, e);
         this.setState({code:newValue});
     }
 
