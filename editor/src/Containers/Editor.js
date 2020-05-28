@@ -70,19 +70,19 @@ class Editor extends Component {
             input: this.state.input,
             id: this.props.match.params.id
         }).then(response => {
-            this.state.binding._outListener(this.state.output, response.data);
+            this.state.binding._inoutListener(this.state.output, response.data, 'output');
             this.setState({ output: response.data });
 
         }).catch(err => {
             if (err.response.status === 400) {
-                this.state.binding._outListener(this.state.output, err.response.data);
+                this.state.binding._inoutListener(this.state.output, err.response.data, 'output');
                 this.setState({ output: err.response.data });
             }
         })
     }
 
     handleInput = (e) => {
-        this.state.binding._inListener(this.state.input, e.target.value);
+        this.state.binding._inoutListener(this.state.input, e.target.value, 'input');
         this.setState({ input: e.target.value });
     }
 

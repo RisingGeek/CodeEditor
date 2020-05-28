@@ -6,17 +6,8 @@ class TextDiffBinding {
     this.path = path || [];
   }
 
-  _get = () => {
-    var value = this.doc.data;
-    for (var i = 0; i < this.path.length; i++) {
-      var segment = this.path[i];
-      value = value[segment];
-    }
-    return value;
-  }
-
   onInput = (newValue, e) => {
-    var previous = this.doc.data.content;
+    let previous = this.doc.data[this.path[0]];
     // Monaco Editor considers new line as \r\n.
     let value = newValue; 
     if (previous === value) return;
@@ -34,24 +25,24 @@ class TextDiffBinding {
         end++;
       }
     if (previous.length !== start + end) {
-      var removed = previous.slice(start, previous.length - end);
+      let removed = previous.slice(start, previous.length - end);
       this._remove(start, removed, e.changes[0].rangeOffset);
     }
     if (value.length !== start + end) {
-      var inserted = value.slice(start, value.length - end);
+      let inserted = value.slice(start, value.length - end);
       this._insert(start, inserted, e.changes[0].rangeOffset);
     }
   };
 
   _insert = (index, text, rangeOffset) => {
-    var path = this.path.concat(index);
-    var op = { p: path, si: text, rangeOffset: rangeOffset };
+    let path = this.path.concat(index);
+    let op = { p: path, si: text, rangeOffset: rangeOffset };
     this.doc.submitOp(op, { source: this });
   };
 
   _remove = (index, text, rangeOffset) => {
-    var path = this.path.concat(index);
-    var op = { p: path, sd: text, rangeOffset: rangeOffset };
+    let path = this.path.concat(index);
+    let op = { p: path, sd: text, rangeOffset: rangeOffset };
     this.doc.submitOp(op, { source: this });
   };
 
@@ -77,7 +68,7 @@ class TextDiffBinding {
   _transformSelectionAndUpdate = (rangeOffset, length, transformCursor) => {
     let editor = this.compoThis.state.editor;
     let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
-    var startOffset = transformCursor(rangeOffset, length, cursorOffset);
+    let startOffset = transformCursor(rangeOffset, length, cursorOffset);
     this.update();
     editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
@@ -86,7 +77,7 @@ class TextDiffBinding {
   };
 
   update = (isSetup) => {
-    var value = this._get();
+    let value = this.doc.data[this.path[0]];
     this.compoThis.setState({ code: value });
     if (isSetup) {
       // Current cursor position

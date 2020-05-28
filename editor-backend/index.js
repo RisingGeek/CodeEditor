@@ -45,7 +45,7 @@ app.post('/', (req, res) => {
         if (err) throw err;
         // If doc type is null, create a document
         if (doc.type == null) {
-            doc.create({ content: '', output: [], input: []});
+            doc.create({ content: '', output: [''], input: ['']});
             return;
         }
         // Start server callback
