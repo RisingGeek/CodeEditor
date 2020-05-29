@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const fs = require('fs');
 const { exec } = require('child_process');
+const codeHelper = require('../Helpers/codeHelper');
 
 router.post('/run', (req, res) => {
     //req.body items
@@ -9,49 +10,19 @@ router.post('/run', (req, res) => {
     let id = req.body.id;
 
     // Step 1: Make 2 files and copy source code and input to it. 
-    const sourceFile = new Promise((resolve, reject) => {
-        fs.writeFile(`${id}.cpp`, code, err => {
-            if (err)
-                reject(err);
-            resolve('source file created');
-        });
-    });
-    const inputFile = new Promise((resolve, reject) => {
-        fs.writeFile(`${id}.txt`, input, err => {
-            if (err)
-                reject(err);
-            resolve('input file created');
-        });
-    });
+    const sourceFile = codeHelper.createFile(id, '.cpp', code);
+    const inputFile = codeHelper.createFile(id, '.txt', input);
 
     // Step 2: Execute child process to generate output
     Promise.all([sourceFile, inputFile]).then(response => {
         // exec opens a new terminal and executes the command
         const command = `g++ ${id}.cpp -o ${id}.out && ./${id}.out < ${id}.txt`;
         exec(command, (error, stdout, stderr) => {
-            // console.log({stdout}, {stderr});
             //Step 3: Delete source, input and out file. 
-            const delSourceFile = new Promise((resolve, reject) => {
-                fs.unlink(`${id}.cpp`, err => {
-                    if (err) reject(err);
-                    resolve('Removed source file');
-                });
-            });
-            const delInputFile = new Promise((resolve, reject) => {
-                fs.unlink(`${id}.txt`, err => {
-                    if (err) reject(err);
-                    resolve('Removed input file');
-                });
-            });
-            const delOutFile = new Promise((resolve, reject) => {
-                //out file will not be generated when error occurs.s
-                if (stderr)
-                    resolve('No need to delete out file');
-                fs.unlink(`${id}.out`, err => {
-                    if (err) reject(err);
-                    resolve('Removed out file');
-                });
-            });
+            console.log(stderr)
+            const delSourceFile = codeHelper.removeFile(id, '.cpp');
+            const delInputFile = codeHelper.removeFile(id, '.txt');
+            const delOutFile = codeHelper.removeFile(id, '.out', stderr);
 
             Promise.all([delSourceFile, delInputFile, delOutFile]).then(response2 => {
                 if (stderr) {
