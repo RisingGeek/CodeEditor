@@ -10,7 +10,7 @@ class Home extends Component {
     render() {
         return(
             <div>
-                <Link to={`/${this.createId()}`}>create editor</Link>
+                <Link to={`/CodeEditor/${this.createId()}`}>create editor</Link>
             </div>
         );
     }
