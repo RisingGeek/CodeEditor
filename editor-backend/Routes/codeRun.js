@@ -8,35 +8,36 @@ router.post('/run', (req, res) => {
     let code = req.body.code;
     let input = req.body.input;
     let id = req.body.id;
+    let lang = req.body.lang;
 
-    // Step 1: Make 2 files and copy source code and input to it. 
-    const sourceFile = codeHelper.createFile(id, '.cpp', code);
-    const inputFile = codeHelper.createFile(id, '.txt', input);
+    // Extension of source code file
+    const sourceExt = {
+        'cpp': '.cpp',
+        'java': '.java'
+    }
+    // Compile and run command
+    const command = {
+        'cpp': `cd ${id} && g++ Main.cpp -o out && ./out < input.txt`,
+        'java': `cd ${id} && javac Main.java && java Main < input.txt`
+    }
+
+    // Step 1: Make unique directory and 2 files inside directory and copy source code and input to it. 
+    codeHelper.createDir(id);
+    const sourceFile = codeHelper.createFile(`./${id}/Main`, sourceExt[lang], code);
+    const inputFile = codeHelper.createFile(`./${id}/input`, '.txt', input);
 
     // Step 2: Execute child process to generate output
-    Promise.all([sourceFile, inputFile]).then(response => {
-        // exec opens a new terminal and executes the command
-        const command = `g++ ${id}.cpp -o ${id}.out && ./${id}.out < ${id}.txt`;
-        exec(command, (error, stdout, stderr) => {
-            //Step 3: Delete source, input and out file. 
-            console.log(stderr)
-            const delSourceFile = codeHelper.removeFile(id, '.cpp');
-            const delInputFile = codeHelper.removeFile(id, '.txt');
-            const delOutFile = codeHelper.removeFile(id, '.out', stderr);
+    // exec opens a new terminal and executes the command
+    exec(command[lang], (error, stdout, stderr) => {
+        //Step 3: Delete directory
+        codeHelper.removeDir(id);
 
-            Promise.all([delSourceFile, delInputFile, delOutFile]).then(response2 => {
-                if (stderr) {
-                    // 400 error status because of bad request(code variable is not valid)
-                    res.status(400).json(stderr);
-                }
-                else
-                    res.send(stdout);
-            }).catch(err => {
-                console.log(err);
-            });
-        });
-    }).catch(err => {
-        console.log(err);
+        if (stderr) {
+            // 400 error status because of bad request(code variable is not valid)
+            res.status(400).json(stderr);
+        }
+        else
+            res.send(stdout);
     });
 });
 
