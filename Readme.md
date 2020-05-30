@@ -17,6 +17,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Operational_transformatio
 
 ### Languages currently supported:
    - C++
+   - Java
 
 ### Completed Features:
    - **Real Time Editing:** Edit code in a real time monaco editor. Input and output are also real time.

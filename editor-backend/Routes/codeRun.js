@@ -23,8 +23,8 @@ router.post('/run', (req, res) => {
 
     // Step 1: Make unique directory and 2 files inside directory and copy source code and input to it. 
     codeHelper.createDir(id);
-    const sourceFile = codeHelper.createFile(`./${id}/Main`, sourceExt[lang], code);
-    const inputFile = codeHelper.createFile(`./${id}/input`, '.txt', input);
+    codeHelper.createFile(`./${id}/Main`, sourceExt[lang], code);
+    codeHelper.createFile(`./${id}/input`, '.txt', input);
 
     // Step 2: Execute child process to generate output
     // exec opens a new terminal and executes the command
