@@ -68,7 +68,8 @@ class Editor extends Component {
         axios.post(serverURL + '/code/run', {
             code: code,
             input: this.state.input,
-            id: this.props.match.params.id
+            id: this.props.match.params.id,
+            lang: this.state.editor.getModel().getLanguageIdentifier().language
         }).then(response => {
             this.state.binding._inoutListener(this.state.output, response.data, 'output');
             this.setState({ output: response.data });
@@ -86,6 +87,11 @@ class Editor extends Component {
         this.setState({ input: e.target.value });
     }
 
+    handleLang = value => {
+        this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
+        console.log(this.state.editor.getModel().getLanguageIdentifier())
+    }
+
     render() {
         return (
             <EditorComponent
@@ -96,6 +102,7 @@ class Editor extends Component {
                 editorOnChange={this.editorOnChange}
                 handleRun={this.handleRun}
                 handleInput={this.handleInput}
+                handleLang={this.handleLang}
             />
         );
     }

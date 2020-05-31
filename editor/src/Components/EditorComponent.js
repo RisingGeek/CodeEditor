@@ -1,10 +1,11 @@
 import React from 'react';
 import MonacoEditor from 'react-monaco-editor';
-import {Input} from 'antd';
+import {Input, Select, Button} from 'antd';
 const {TextArea} = Input;
+const {Option} = Select;
 
 const EditorComponent = props => {
-    const {code,input,output,editorDidMount, editorOnChange, handleRun, handleInput} = props;
+    const {code,input,output,editorDidMount, editorOnChange, handleRun, handleInput, handleLang} = props;
     const options = {
         selectOnLineNumbers: true, // Select line by clicking on line number
         minimap: {
@@ -23,6 +24,10 @@ const EditorComponent = props => {
                 editorDidMount={editorDidMount}
                 onChange={editorOnChange}
             />
+            <Select defaultValue='cpp' onChange={handleLang}>
+                <Option value='cpp'>CPP</Option>
+                <Option value='java'>Java</Option>
+            </Select>
             <button onClick={handleRun}>run code</button>
             <div>input:</div>
             <TextArea value={input} onChange={handleInput} />
