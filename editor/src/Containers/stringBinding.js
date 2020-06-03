@@ -38,7 +38,7 @@ class StringBinding extends TextDiffBinding {
     }
     console.log(op, source);
     let component = op[0];
-    if (component.p[0] === 'output' || component.p[0] === 'input') {
+    if (component.p[0] === 'output' || component.p[0] === 'input' || component.p[0] === 'lang') {
       this.updateInputOutput(component.ld, component.li, component.p[0]);
     }
     else if (this.isSubpath(this.path, component.p)) {

@@ -19,6 +19,7 @@ class Editor extends Component {
             code: '',
             input: '',
             output: '',
+            lang: 'cpp',
             editor: null,
             monaco: null,
             binding: null,
@@ -88,16 +89,21 @@ class Editor extends Component {
     }
 
     handleLang = value => {
-        this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
-        console.log(this.state.editor.getModel().getLanguageIdentifier())
+        // this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
+        // console.log(this.state.editor.getModel().getLanguageIdentifier())
+        this.state.binding._inoutListener(this.state.lang, value, 'lang');
+        this.setState({lang: value});
     }
 
     render() {
+        if(this.state.editor)
+            console.log(this.state.editor.getModel().getLanguageIdentifier())
         return (
             <EditorComponent
                 code={this.state.code}
                 input={this.state.input}
                 output={this.state.output}
+                lang = {this.state.lang}
                 editorDidMount={this.editorDidMount}
                 editorOnChange={this.editorOnChange}
                 handleRun={this.handleRun}
