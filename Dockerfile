@@ -8,6 +8,8 @@ RUN apt-get install npm -y
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
+RUN apt install default-jre -y
+RUN apt install default-jdk -y
 COPY /editor-backend/package.json .
 COPY /editor-backend .
 CMD ["npm","start"]
