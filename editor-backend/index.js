@@ -33,6 +33,17 @@ wss.on('connection', ws => {
     share.listen(stream);
 });
 
+share.use('receive', function (request, next) {
+    var data = request.data;
+    console.log('data',data)
+    if (data.myApp) {
+        // Handle app specific messages and don't call next
+        return;
+    }
+    // Call next to pass other messages to ShareDB
+    next();
+});
+
 const connection = share.connect();
 
 app.post('/', (req, res) => {
@@ -45,7 +56,7 @@ app.post('/', (req, res) => {
         if (err) throw err;
         // If doc type is null, create a document
         if (doc.type == null) {
-            doc.create({ content: '', output: [''], input: [''], lang: ['']});
+            doc.create({ content: '', output: [''], input: [''], lang: [''] });
             return;
         }
         // Start server callback

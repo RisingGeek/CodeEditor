@@ -23,6 +23,7 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
+            connection: null
         }
     }
 
@@ -41,7 +42,7 @@ class Editor extends Component {
                 if (err) throw err;
                 var binding = new StringBinding(this.state.editor, this, doc, ['content']);
                 binding.setup(this);
-                this.setState({ binding });
+                this.setState({ binding, connection });
             });
         }).catch(err => {
             console.log('some error occured');
@@ -95,10 +96,15 @@ class Editor extends Component {
         this.setState({lang: value});
     }
 
+    handleClick = () => {
+        console.log('button click')
+        this.state.connection.send({myApp: 'sample value'});
+    }
+
     render() {
-        if(this.state.editor)
-            console.log(this.state.editor.getModel().getLanguageIdentifier())
         return (
+            <React.Fragment>
+                <button onClick={this.handleClick}>click</button>
             <EditorComponent
                 code={this.state.code}
                 input={this.state.input}
@@ -110,6 +116,7 @@ class Editor extends Component {
                 handleInput={this.handleInput}
                 handleLang={this.handleLang}
             />
+            </React.Fragment>
         );
     }
 }
