@@ -15,6 +15,8 @@ const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.
 class Editor extends Component {
     constructor(props) {
         super(props);
+        this.localVideo = React.createRef();
+        this.remoteVideo = React.createRef();
         this.state = {
             code: '',
             input: '',
@@ -23,7 +25,9 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
-            connection: null
+            connection: null,
+            pc: null,
+            isOffer: false
         }
     }
 
@@ -35,18 +39,113 @@ class Editor extends Component {
             //open websocket connection to shareDB server
             const rws = new ReconnectingWebSocket(websocketURL);
             const connection = new shareDB.Connection(rws);
+
+            var pc = new window.RTCPeerConnection({
+                iceServers: [{
+                    url: "stun:stun.services.mozilla.com",
+                    username: "somename",
+                    credential: "somecredentials"
+                }]
+            });
+            const mediaStreamConstraints = {
+                video: true,
+            };
+
+            // Local stream that will be reproduced on the video.
+            let localStream;
+            pc.onaddstream = (obj) => {
+                console.log('connect to peer');
+                this.remoteVideo.current.srcObject = obj.stream;
+            }
+
+            // Handles error by logging a message to the console with the error message.
+            function handleLocalMediaStreamError(error) {
+                console.log('navigator.getUserMedia error: ', error);
+            }
+
+            // Initializes media stream.
+            navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
+                .then((mediaStream) => {
+                    localStream = mediaStream;
+                    this.localVideo.current.srcObject = mediaStream;
+                    console.log({ mediaStream })
+                    pc.addStream(mediaStream);
+                }).catch(handleLocalMediaStreamError);
+
+            var offer;
+            var connectedToPeer = false;
+            connection.on('receive', (request) => {
+                let data = request.data;
+                if (data.offerMade) {
+                    // remote
+                    request.data = null;
+                    if (this.state.isOffer)
+                        return;
+                    console.log(data.offerMade.offer)
+                    offer = data.offerMade.offer;
+
+                    pc.setRemoteDescription(new RTCSessionDescription(data.offerMade.offer), () => {
+                        pc.createAnswer((answer) => {
+                            console.log(answer);
+                            pc.setLocalDescription(new RTCSessionDescription(answer), () => {
+                                connection.send({
+                                    makeAnswer: {
+                                        answer: answer
+                                    }
+                                });
+                            }, this.error);
+                        }, this.error);
+                    }, this.error);
+                    return;
+                }
+                if (data.answerMade) {
+                    // local
+                    console.log(data.answerMade)
+                    request.data = null;
+                    if (!this.state.isOffer)
+                        return;
+                    pc.setRemoteDescription(new RTCSessionDescription(data.answerMade.answer), () => {
+                        // document.getElementById(data.socket).setAttribute('class', 'active');
+                        if (!connectedToPeer) {
+                            this.createOffer();
+                            connectedToPeer = true;
+                            // answersFrom[data.socket] = true;
+                        }
+                    }, this.error);
+                    return;
+                }
+            });
+
             //create local doc instance mapped to 'examples' collection document with id 'textarea'
             const doc = connection.get('examples', id);
-            
+
             doc.subscribe((err) => {
                 if (err) throw err;
                 var binding = new StringBinding(this.state.editor, this, doc, ['content']);
                 binding.setup(this);
-                this.setState({ binding, connection });
+                this.setState({ binding, connection, pc });
             });
+
         }).catch(err => {
             console.log('some error occured');
         });
+    }
+
+    createOffer = () => {
+        this.state.pc.createOffer((offer) => {
+            this.state.pc.setLocalDescription(new RTCSessionDescription(offer), () => {
+                this.state.connection.send({
+                    makeOffer: {
+                        offer: offer
+                    }
+                });
+            }, this.error);
+        }, this.error);
+        this.setState({ isOffer: true });
+    }
+
+    error = (err) => {
+        console.warn('Error', err);
     }
 
     editorDidMount = (editor, monaco) => {
@@ -59,7 +158,7 @@ class Editor extends Component {
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
         this.state.binding._inputListener(newValue, e);
-        this.setState({code:newValue});
+        this.setState({ code: newValue });
     }
 
     // Handler for Run Code button
@@ -93,29 +192,32 @@ class Editor extends Component {
         // this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
         // console.log(this.state.editor.getModel().getLanguageIdentifier())
         this.state.binding._inoutListener(this.state.lang, value, 'lang');
-        this.setState({lang: value});
+        this.setState({ lang: value });
     }
 
     handleClick = () => {
         console.log('button click')
-        this.state.connection.send({myApp: 'sample value'});
+        // this.state.connection.send({ myApp: 'sample value' });
+        this.createOffer();
     }
 
     render() {
         return (
             <React.Fragment>
-                <button onClick={this.handleClick}>click</button>
-            <EditorComponent
-                code={this.state.code}
-                input={this.state.input}
-                output={this.state.output}
-                lang = {this.state.lang}
-                editorDidMount={this.editorDidMount}
-                editorOnChange={this.editorOnChange}
-                handleRun={this.handleRun}
-                handleInput={this.handleInput}
-                handleLang={this.handleLang}
-            />
+                <button onClick={this.handleClick}>send video</button>
+                <video ref={this.localVideo} autoPlay={true} playsInline={true}></video>
+                <video ref={this.remoteVideo} autoPlay={true} playsInline={true}></video>
+                <EditorComponent
+                    code={this.state.code}
+                    input={this.state.input}
+                    output={this.state.output}
+                    lang={this.state.lang}
+                    editorDidMount={this.editorDidMount}
+                    editorOnChange={this.editorOnChange}
+                    handleRun={this.handleRun}
+                    handleInput={this.handleInput}
+                    handleLang={this.handleLang}
+                />
             </React.Fragment>
         );
     }

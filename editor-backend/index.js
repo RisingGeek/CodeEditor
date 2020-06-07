@@ -35,7 +35,24 @@ wss.on('connection', ws => {
 
 share.use('receive', function (request, next) {
     var data = request.data;
-    console.log('data',data)
+    if (data.makeOffer) {
+        request.agent.send({
+            offerMade: {
+                offer: data.makeOffer.offer
+            }
+        });
+        return;
+    }
+    else if(data.makeAnswer) {
+        request.agent.send({
+            answerMade: {
+                answer: data.makeAnswer.answer
+            }
+        });
+        return;
+    }
+
+    console.log('data', data)
     if (data.myApp) {
         // Handle app specific messages and don't call next
         return;
