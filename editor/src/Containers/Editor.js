@@ -38,7 +38,7 @@ class Editor extends Component {
             const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
             videoSocket.addEventListener('open', event => {
                 console.log('connected to video server')
-                videoSocket.send(JSON.stringify({ offer: 'this is offer text' }))
+                // videoSocket.send(JSON.stringify({ offer: 'this is offer text' }))
                 // videoSocket.send(JSON.stringify({answer: 'this is answer text'}))
             })
 
@@ -54,7 +54,8 @@ class Editor extends Component {
                 video: true,
             };
 
-            pc.onaddstream = this.addStream;
+            // pc.onaddstream = this.addStream;
+            pc.ontrack = this.addTrack;
 
             // Initializes media stream.
             navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
@@ -63,7 +64,10 @@ class Editor extends Component {
                         // Handles success by adding the MediaStream to the video element.
                         this.localVideo.current.srcObject = mediaStream;
                         // console.log({mediaStream})
-                        pc.addStream(mediaStream);
+                        mediaStream.getTracks().forEach(track => {
+                            pc.addTrack(track, mediaStream);
+                        })
+                        // pc.addStream(mediaStream);
                     }
                 ).catch(this.handleLocalMediaStreamError);
 
@@ -114,9 +118,10 @@ class Editor extends Component {
         });
     }
 
-    addStream = obj => {
+    addTrack = event => {
         console.log('connect to peer');
-        this.remoteVideo.current.srcObject = obj.stream;
+        this.remoteVideo.current.srcObject = event.streams[0];
+        console.log(this.remoteVideo.current.srcObject)
     }
 
     // Handles error by logging a message to the console with the error message.
