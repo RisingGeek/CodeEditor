@@ -34,24 +34,32 @@ wss.on('connection', ws => {
     share.listen(stream);
 });
 
-const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
-
 videoSocket.on('connection', ws => {
     ws.on('message', data => {
-        const obj = JSON.parse(data);
-        if(obj['offer']) {
-            console.log(obj['offer']);
+        const on = JSON.parse(data);
+        // console.log(on)
+        if (on['makeOffer']) {
+            // console.log(on['offer']);
+            videoSocket.clients.forEach(client => {
+                if (client != ws)
+                    client.send(JSON.stringify({ offerMade: { offer: on['makeOffer'].offer } }));
+            })
         }
-        else {
-            console.log(obj['answer'])
+        else if (on['makeAnswer']) {
+            videoSocket.clients.forEach(client => {
+                if (client != ws)
+                    client.send(JSON.stringify({ answerMade: { answer: on['makeAnswer'].answer } }));
+            })
         }
-        console.log(data);
     })
 })
 
+const connection = share.connect();
+
+const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 server.on('upgrade', (request, socket, head) => {
     const pathname = url.parse(request.url).pathname;
-    console.log(pathname)
+    // console.log(pathname)
 
     if (pathname === '/foo') {
         videoSocket.handleUpgrade(request, socket, head, (ws) => {
@@ -66,10 +74,10 @@ server.on('upgrade', (request, socket, head) => {
     }
 });
 
-const connection = share.connect();
-
 app.post('/', (req, res) => {
     let id = req.body.id;
+    console.log(id);
+    // console.log(id);
     // doc->shareDB.Doc instance
     // examples-> connection name, textarea-> document id
     const doc = connection.get('examples', id);
@@ -77,6 +85,7 @@ app.post('/', (req, res) => {
     doc.fetch(err => {
         if (err) throw err;
         // If doc type is null, create a document
+        console.log(doc.type)
         if (doc.type == null) {
             doc.create({ content: '', output: [''], input: [''], lang: [''] });
             return;

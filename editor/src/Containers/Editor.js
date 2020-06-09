@@ -15,6 +15,8 @@ const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.
 class Editor extends Component {
     constructor(props) {
         super(props);
+        this.remoteVideo = React.createRef();
+        this.localVideo = React.createRef();
         this.state = {
             code: '',
             input: '',
@@ -23,6 +25,8 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
+            videoSocket: null,
+            pc: null
         }
     }
 
@@ -31,14 +35,70 @@ class Editor extends Component {
         axios.post(serverURL, {
             id: id
         }).then(res => {
-            const videoSocket = new ReconnectingWebSocket(websocketURL+'/foo');
-            videoSocket.addEventListener('open',event => {
+            const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
+            videoSocket.addEventListener('open', event => {
                 console.log('connected to video server')
-                videoSocket.send(JSON.stringify({offer: 'this is offer text'}))
+                videoSocket.send(JSON.stringify({ offer: 'this is offer text' }))
                 // videoSocket.send(JSON.stringify({answer: 'this is answer text'}))
             })
+
+            var pc = new window.RTCPeerConnection({
+                iceServers: [{
+                    url: "stun:stun.services.mozilla.com",
+                    username: "somename",
+                    credential: "somecredentials"
+                }]
+            });
+
+            const mediaStreamConstraints = {
+                video: true,
+            };
+
+            pc.onaddstream = this.addStream;
+
+            // Initializes media stream.
+            navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
+                .then(
+                    (mediaStream) => {
+                        // Handles success by adding the MediaStream to the video element.
+                        this.localVideo.current.srcObject = mediaStream;
+                        // console.log({mediaStream})
+                        pc.addStream(mediaStream);
+                    }
+                ).catch(this.handleLocalMediaStreamError);
+
+            var connectedToPeer = false;
+            videoSocket.addEventListener('message', event => {
+                const on = JSON.parse(event.data);
+                if (on['offerMade']) {
+                    // other person listens to offer-made
+                    // offer = data.offer;
+                    // console.log(offer);
+                    pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer), () => {
+                        pc.createAnswer((answer) => {
+                            pc.setLocalDescription(new RTCSessionDescription(answer), () => {
+                                videoSocket.send(JSON.stringify({ makeAnswer: { answer: answer } }));
+                            }, this.error);
+                        }, this.error);
+                    }, this.error);
+
+                }
+                else if (on['answerMade']) {
+                    // I listen to answer-made
+                    pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer), () => {
+                        // document.getElementById(data.socket).setAttribute('class', 'active');
+                        if (!connectedToPeer) {
+                            // I make offer
+                            this.createOffer();
+                            connectedToPeer = true;
+                            // answersFrom[data.socket] = true;
+                        }
+                    }, this.error);
+                }
+            })
+
             //open websocket connection to shareDB server
-            const rws = new ReconnectingWebSocket(websocketURL+'/bar');
+            const rws = new ReconnectingWebSocket(websocketURL + '/bar');
             const connection = new shareDB.Connection(rws);
             //create local doc instance mapped to 'examples' collection document with id 'textarea'
             const doc = connection.get('examples', id);
@@ -47,11 +107,25 @@ class Editor extends Component {
                 if (err) throw err;
                 var binding = new StringBinding(this.state.editor, this, doc, ['content']);
                 binding.setup(this);
-                this.setState({ binding });
+                this.setState({ binding, videoSocket, pc });
             });
         }).catch(err => {
             console.log('some error occured');
         });
+    }
+
+    addStream = obj => {
+        console.log('connect to peer');
+        this.remoteVideo.current.srcObject = obj.stream;
+    }
+
+    // Handles error by logging a message to the console with the error message.
+    handleLocalMediaStreamError = (error) => {
+        console.log('navigator.getUserMedia error: ', error);
+    }
+
+    error = (err) => {
+        console.warn('Error', err);
     }
 
     editorDidMount = (editor, monaco) => {
@@ -95,27 +169,42 @@ class Editor extends Component {
     }
 
     handleLang = value => {
-        // this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
-        // console.log(this.state.editor.getModel().getLanguageIdentifier())
         this.state.binding._inoutListener(this.state.lang, value, 'lang');
         this.setState({ lang: value });
+    }
+
+    createOffer = () => {
+        console.log('create offer')
+        console.log(this.state.pc)
+        this.state.pc.createOffer((offer) => {
+            this.state.pc.setLocalDescription(new RTCSessionDescription(offer), () => {
+                // I make offer
+                this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: offer } }));
+            }, this.error);
+        }, this.error);
+
     }
 
     render() {
         // if (this.state.editor)
         //     console.log(this.state.editor.getModel().getLanguageIdentifier())
         return (
-            <EditorComponent
-                code={this.state.code}
-                input={this.state.input}
-                output={this.state.output}
-                lang={this.state.lang}
-                editorDidMount={this.editorDidMount}
-                editorOnChange={this.editorOnChange}
-                handleRun={this.handleRun}
-                handleInput={this.handleInput}
-                handleLang={this.handleLang}
-            />
+            <React.Fragment>
+                <video id="local" ref={this.localVideo} autoPlay={true} playsInline={true}></video>
+                <video id="remote" ref={this.remoteVideo} autoPlay={true} playsInline={true}></video>
+                <button onClick={this.createOffer}>click</button>
+                <EditorComponent
+                    code={this.state.code}
+                    input={this.state.input}
+                    output={this.state.output}
+                    lang={this.state.lang}
+                    editorDidMount={this.editorDidMount}
+                    editorOnChange={this.editorOnChange}
+                    handleRun={this.handleRun}
+                    handleInput={this.handleInput}
+                    handleLang={this.handleLang}
+                />
+            </React.Fragment>
         );
     }
 }
