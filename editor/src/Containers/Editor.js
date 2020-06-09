@@ -31,12 +31,18 @@ class Editor extends Component {
         axios.post(serverURL, {
             id: id
         }).then(res => {
+            const videoSocket = new ReconnectingWebSocket(websocketURL+'/foo');
+            videoSocket.addEventListener('open',event => {
+                console.log('connected to video server')
+                videoSocket.send(JSON.stringify({offer: 'this is offer text'}))
+                // videoSocket.send(JSON.stringify({answer: 'this is answer text'}))
+            })
             //open websocket connection to shareDB server
-            const rws = new ReconnectingWebSocket(websocketURL);
+            const rws = new ReconnectingWebSocket(websocketURL+'/bar');
             const connection = new shareDB.Connection(rws);
             //create local doc instance mapped to 'examples' collection document with id 'textarea'
             const doc = connection.get('examples', id);
-            
+
             doc.subscribe((err) => {
                 if (err) throw err;
                 var binding = new StringBinding(this.state.editor, this, doc, ['content']);
@@ -58,7 +64,7 @@ class Editor extends Component {
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
         this.state.binding._inputListener(newValue, e);
-        this.setState({code:newValue});
+        this.setState({ code: newValue });
     }
 
     // Handler for Run Code button
@@ -92,18 +98,18 @@ class Editor extends Component {
         // this.state.monaco.editor.setModelLanguage(this.state.editor.getModel(), value);
         // console.log(this.state.editor.getModel().getLanguageIdentifier())
         this.state.binding._inoutListener(this.state.lang, value, 'lang');
-        this.setState({lang: value});
+        this.setState({ lang: value });
     }
 
     render() {
-        if(this.state.editor)
-            console.log(this.state.editor.getModel().getLanguageIdentifier())
+        // if (this.state.editor)
+        //     console.log(this.state.editor.getModel().getLanguageIdentifier())
         return (
             <EditorComponent
                 code={this.state.code}
                 input={this.state.input}
                 output={this.state.output}
-                lang = {this.state.lang}
+                lang={this.state.lang}
                 editorDidMount={this.editorDidMount}
                 editorOnChange={this.editorOnChange}
                 handleRun={this.handleRun}
