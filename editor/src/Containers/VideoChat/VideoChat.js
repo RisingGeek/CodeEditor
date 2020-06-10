@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import styles from './main.module.css';
 
-import getEnv from '../environment';
-
-const isDev = getEnv();
-const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.env.REACT_APP_PROD_WEB_SOCKET_URL;
+const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
 class VideoChat extends Component {
     constructor(props) {
@@ -32,26 +30,22 @@ class VideoChat extends Component {
             }]
         });
 
+        // pc.onaddstream = this.addStream;
+        pc.ontrack = this.addTrack;
+
         const mediaStreamConstraints = {
             video: true,
         };
 
-        // pc.onaddstream = this.addStream;
-        pc.ontrack = this.addTrack;
-
         // Initializes media stream.
-        navigator.mediaDevices.getUserMedia(mediaStreamConstraints)
-            .then(
-                (mediaStream) => {
-                    // Handles success by adding the MediaStream to the video element.
-                    this.localRef.current.srcObject = mediaStream;
-                    // console.log({mediaStream})
-                    mediaStream.getTracks().forEach(track => {
-                        pc.addTrack(track, mediaStream);
-                    })
-                    // pc.addStream(mediaStream);
-                }
-            ).catch(this.handleLocalMediaStreamError);
+        navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
+            // Handles success by adding the MediaStream to the video element.
+            this.localRef.current.srcObject = mediaStream;
+            mediaStream.getTracks().forEach(track => {
+                this.state.pc.addTrack(track, mediaStream);
+            })
+            // pc.addStream(mediaStream);
+        }).catch(this.handleLocalMediaStreamError);
 
         let connectedToPeer = false;
         videoSocket.addEventListener('message', event => {
@@ -83,7 +77,7 @@ class VideoChat extends Component {
             }
         });
 
-        this.setState({ videoSocket, pc })
+        this.setState({ videoSocket, pc });
     }
 
     addTrack = event => {
@@ -109,17 +103,20 @@ class VideoChat extends Component {
                 this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: offer } }));
             }, this.error);
         }, this.error);
-
     }
 
     render() {
         // console.log(this)
         return (
-            <div>
-                <video id="local" ref={this.localRef} autoPlay={true}></video>
-                <video id="remote" ref={this.remoteRef} autoPlay={true}></video>
-                <button onClick={this.createOffer}>click</button>
-            </div>
+            <React.Fragment>
+                <div className={styles.remote}>
+                    <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
+                        <div className={styles.local}>
+                            <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                        </div>
+                </div>
+                <button onClick={this.createOffer}>video chat</button>
+            </React.Fragment>
         );
     }
 }

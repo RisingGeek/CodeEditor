@@ -6,12 +6,10 @@ import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from './stringBinding';
-import getEnv from '../environment';
-import VideoChat from './VideoChat';
+import VideoChat from './VideoChat/VideoChat';
 
-const isDev = getEnv();
-const serverURL = isDev ? process.env.REACT_APP_DEV_SERVER_URL : process.env.REACT_APP_PROD_SERVER_URL;
-const websocketURL = isDev ? process.env.REACT_APP_DEV_WEB_SOCKET_URL : process.env.REACT_APP_PROD_WEB_SOCKET_URL;
+const serverURL = process.env.REACT_APP_SERVER_URL;
+const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
 class Editor extends Component {
     constructor(props) {
@@ -95,9 +93,6 @@ class Editor extends Component {
     }
 
     render() {
-        // console.log(this)
-        // if (this.state.editor)
-        //     console.log(this.state.editor.getModel().getLanguageIdentifier())
         return (
             <React.Fragment>
                 <VideoChat />
