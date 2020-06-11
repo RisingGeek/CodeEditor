@@ -1,6 +1,7 @@
 .remote {
   position: relative;
   width: 300px;
+  z-index: 1;
 }
 
 .local {

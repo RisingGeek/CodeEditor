@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
+import Draggable from 'react-draggable';
 import styles from './main.module.css';
 
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -9,6 +10,7 @@ class VideoChat extends Component {
         super(props);
         this.remoteRef = React.createRef();
         this.localRef = React.createRef();
+        this.draggableRef = React.createRef();
         this.state = {
             videoSocket: null,
             pc: null,
@@ -97,15 +99,16 @@ class VideoChat extends Component {
     }
 
     render() {
-        // console.log(this)
         return (
             <React.Fragment>
-                <div className={styles.remote}>
-                    <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
-                    <div className={styles.local}>
-                        <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                <Draggable nodeRef={this.draggableRef}>
+                    <div className={styles.remote} ref={this.draggableRef}>
+                        <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
+                        <div className={styles.local}>
+                            <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                        </div>
                     </div>
-                </div>
+                </Draggable>
                 <button onClick={this.createOffer}>video chat</button>
             </React.Fragment>
         );

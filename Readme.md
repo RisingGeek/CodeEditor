@@ -2,9 +2,9 @@
 Code Pair is a clone of [HackerRank's CodePair](https://www.hackerrank.com/products/codepair/) platform. It provides an interactive Monaco Editor to write code and run it against a custom testcase. Users can edit code in realtime, similar to what Google docs provide.
 
 # Run Locally
-Frontend:
+### Frontend:
 `cd editor && npm start`
-Backend:
+### Backend:
 `cd editor-backend && npm run dev`
 
 ### How real time editing works:
