@@ -22,13 +22,7 @@ class VideoChat extends Component {
             console.log('connected to video server')
         });
 
-        let pc = new window.RTCPeerConnection({
-            iceServers: [{
-                url: "stun:stun.services.mozilla.com",
-                username: "somename",
-                credential: "somecredentials"
-            }]
-        });
+        let pc = new window.RTCPeerConnection();
 
         // pc.onaddstream = this.addStream;
         pc.ontrack = this.addTrack;
@@ -51,9 +45,8 @@ class VideoChat extends Component {
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
-                // other person listens to offer-made
-                // offer = data.offer;
-                // console.log(offer);
+                console.log('offer made');
+                // other person listens to offerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer), () => {
                     pc.createAnswer((answer) => {
                         pc.setLocalDescription(new RTCSessionDescription(answer), () => {
@@ -64,14 +57,13 @@ class VideoChat extends Component {
 
             }
             else if (on['answerMade']) {
-                // I listen to answer-made
+                console.log('answer made');
+                // I listen to answerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer), () => {
-                    // document.getElementById(data.socket).setAttribute('class', 'active');
                     if (!connectedToPeer) {
                         // I make offer
                         this.createOffer();
                         connectedToPeer = true;
-                        // answersFrom[data.socket] = true;
                     }
                 }, this.error);
             }
@@ -96,7 +88,6 @@ class VideoChat extends Component {
 
     createOffer = () => {
         console.log('create offer')
-        console.log(this.state.pc)
         this.state.pc.createOffer((offer) => {
             this.state.pc.setLocalDescription(new RTCSessionDescription(offer), () => {
                 // I make offer
@@ -111,9 +102,9 @@ class VideoChat extends Component {
             <React.Fragment>
                 <div className={styles.remote}>
                     <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
-                        <div className={styles.local}>
-                            <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
-                        </div>
+                    <div className={styles.local}>
+                        <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                    </div>
                 </div>
                 <button onClick={this.createOffer}>video chat</button>
             </React.Fragment>

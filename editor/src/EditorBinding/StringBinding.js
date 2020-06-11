@@ -1,4 +1,4 @@
-import TextDiffBinding from './textDiffBinding';
+import TextDiffBinding from './TextDiffBinding';
 
 class StringBinding extends TextDiffBinding {
   setup = () => {

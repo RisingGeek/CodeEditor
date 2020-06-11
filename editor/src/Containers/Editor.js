@@ -5,7 +5,7 @@ import axios from 'axios';
 // automatically reconnects if the connection is closed
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
-import StringBinding from './stringBinding';
+import StringBinding from '../EditorBinding/StringBinding';
 import VideoChat from './VideoChat/VideoChat';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
