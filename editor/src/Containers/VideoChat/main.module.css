@@ -1,16 +1,24 @@
-.remote {
-  position: relative;
-  width: 300px;
+.outer {
+  position:absolute;
+  width:17%;
+  height:auto;
   z-index: 1;
+}
+.remote {
+  position: absolute;
+  width: 100%;
+  height:auto;
 }
 
 .local {
   position: absolute;
   bottom: 0;
   right: 0;
-  width: 100px;
+  width: 35%;
+  height:auto;
 }
 
 .remoteVideo, .localVideo {
   width: 100%;
+  height: auto;
 }

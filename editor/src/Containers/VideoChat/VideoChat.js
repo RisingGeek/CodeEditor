@@ -33,10 +33,13 @@ class VideoChat extends Component {
             video: true,
         };
 
+        let localMediaStream;
         // Initializes media stream.
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
-            this.localRef.current.srcObject = mediaStream;
+            // this.localRef.current.srcObject = mediaStream;
+            localMediaStream = mediaStream;
+            this.remoteRef.current.srcObject = mediaStream;
             mediaStream.getTracks().forEach(track => {
                 this.state.pc.addTrack(track, mediaStream);
             })
@@ -53,6 +56,7 @@ class VideoChat extends Component {
                     pc.createAnswer((answer) => {
                         pc.setLocalDescription(new RTCSessionDescription(answer), () => {
                             videoSocket.send(JSON.stringify({ makeAnswer: { answer: answer } }));
+                            this.localRef.current.srcObject = localMediaStream
                         }, this.error);
                     }, this.error);
                 }, this.error);
@@ -66,6 +70,7 @@ class VideoChat extends Component {
                         // I make offer
                         this.createOffer();
                         connectedToPeer = true;
+                        this.localRef.current.srcObject = localMediaStream;
                     }
                 }, this.error);
             }
@@ -101,11 +106,13 @@ class VideoChat extends Component {
     render() {
         return (
             <React.Fragment>
-                <Draggable nodeRef={this.draggableRef}>
-                    <div className={styles.remote} ref={this.draggableRef}>
-                        <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
-                        <div className={styles.local}>
-                            <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                <Draggable nodeRef={this.draggableRef} defaultPosition={{ x: 900, y: 0 }}>
+                    <div className={styles.outer} ref={this.draggableRef}>
+                        <div className={styles.remote}>
+                            <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
+                            <div className={styles.local}>
+                                <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                            </div>
                         </div>
                     </div>
                 </Draggable>
