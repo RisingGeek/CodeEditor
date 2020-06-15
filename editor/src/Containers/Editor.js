@@ -38,7 +38,7 @@ class Editor extends Component {
 
             doc.subscribe((err) => {
                 if (err) throw err;
-                let binding = new StringBinding(this.state.editor, this, doc, ['content']);
+                let binding = new StringBinding(this, doc, ['content']);
                 binding.setup(this);
                 this.setState({ binding });
             });

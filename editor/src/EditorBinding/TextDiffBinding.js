@@ -1,6 +1,5 @@
 class TextDiffBinding {
-  constructor(element, compoThis, doc, path) {
-    this.element = element;
+  constructor(compoThis, doc, path) {
     this.compoThis = compoThis || null;
     this.doc = doc;
     this.path = path || [];
@@ -79,10 +78,6 @@ class TextDiffBinding {
   update = (isSetup) => {
     let value = this.doc.data[this.path[0]];
     this.compoThis.setState({ code: value });
-    if (isSetup) {
-      // Current cursor position
-      this.compoThis.state.editor.setSelection(new this.compoThis.state.monaco.Range(1, 1, 1, 1));
-    }
   };
   
 }
