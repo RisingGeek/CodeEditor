@@ -51,6 +51,12 @@ videoSocket.on('connection', ws => {
                     client.send(JSON.stringify({ answerMade: { answer: on['makeAnswer'].answer } }));
             })
         }
+        else if(on['candidate']) {
+            videoSocket.clients.forEach(client => {
+                if(client != ws)
+                    client.send(JSON.stringify({candidate: on['candidate']}));
+            })
+        }
     })
 })
 

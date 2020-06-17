@@ -11,6 +11,7 @@ class VideoChat extends Component {
         this.remoteRef = React.createRef();
         this.localRef = React.createRef();
         this.draggableRef = React.createRef();
+
         this.state = {
             videoSocket: null,
             pc: null,
@@ -26,53 +27,45 @@ class VideoChat extends Component {
 
         let pc = new window.RTCPeerConnection();
 
-        // pc.onaddstream = this.addStream;
         pc.ontrack = this.addTrack;
+        pc.onicecandidate = this.onIceCandidate;
+        pc.oniceconnectionstatechange = this.onIceConnectionStateChange;
 
         const mediaStreamConstraints = {
             video: true,
         };
 
-        let localMediaStream;
         // Initializes media stream.
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
-            // this.localRef.current.srcObject = mediaStream;
-            localMediaStream = mediaStream;
-            this.remoteRef.current.srcObject = mediaStream;
+            this.localRef.current.srcObject = mediaStream;
+            //this.remoteRef.current.srcObject = mediaStream;
             mediaStream.getTracks().forEach(track => {
                 this.state.pc.addTrack(track, mediaStream);
-            })
+            });
             // pc.addStream(mediaStream);
         }).catch(this.handleLocalMediaStreamError);
 
-        let connectedToPeer = false;
+
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
                 console.log('offer made');
                 // other person listens to offerMade
-                pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer), () => {
-                    pc.createAnswer((answer) => {
-                        pc.setLocalDescription(new RTCSessionDescription(answer), () => {
-                            videoSocket.send(JSON.stringify({ makeAnswer: { answer: answer } }));
-                            this.localRef.current.srcObject = localMediaStream
-                        }, this.error);
-                    }, this.error);
-                }, this.error);
+                pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
+                    this.createAnswer();
+                }).catch(this.error);
 
             }
             else if (on['answerMade']) {
                 console.log('answer made');
                 // I listen to answerMade
-                pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer), () => {
-                    if (!connectedToPeer) {
-                        // I make offer
-                        this.createOffer();
-                        connectedToPeer = true;
-                        this.localRef.current.srcObject = localMediaStream;
-                    }
-                }, this.error);
+                pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
+                    console.log('remote description set')
+                }).catch(this.error);
+            }
+            else if(on['candidate']) {
+                this.addIceCandidate(on['candidate']);
             }
         });
 
@@ -84,23 +77,46 @@ class VideoChat extends Component {
         this.remoteRef.current.srcObject = event.streams[0];
     }
 
+    onIceCandidate = e => {
+        if (e.candidate) {
+            console.log(e.candidate);
+            this.state.videoSocket.send(JSON.stringify({ candidate: e.candidate }));
+        }
+    }
+
+    onIceConnectionStateChange = e => {
+        console.log(e);
+    }
+
+    addIceCandidate = candidate=> {
+        this.state.pc.addIceCandidate(new RTCIceCandidate(candidate));
+    }
+
     // Handles error by logging a message to the console with the error message.
     handleLocalMediaStreamError = (error) => {
         console.log('navigator.getUserMedia error: ', error);
     }
 
     error = (err) => {
-        console.warn('Error', err);
+        console.log('Error', err);
     }
 
     createOffer = () => {
-        console.log('create offer')
-        this.state.pc.createOffer((offer) => {
-            this.state.pc.setLocalDescription(new RTCSessionDescription(offer), () => {
-                // I make offer
-                this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: offer } }));
-            }, this.error);
-        }, this.error);
+        console.log('offer')
+        this.state.pc.createOffer().then(sdp => {
+            this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
+                this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: sdp } }));
+            }).catch(this.error);
+        }).catch(this.error);
+    }
+
+    createAnswer = () => {
+        console.log('answer');
+        this.state.pc.createAnswer().then(sdp => {
+            this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
+                this.state.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
+            }).catch(this.error)
+        }).catch(this.error);
     }
 
     render() {
