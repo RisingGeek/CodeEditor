@@ -33,6 +33,7 @@ class VideoChat extends Component {
 
         const mediaStreamConstraints = {
             video: true,
+            audio: true
         };
 
         // Initializes media stream.
@@ -64,7 +65,7 @@ class VideoChat extends Component {
                     console.log('remote description set')
                 }).catch(this.error);
             }
-            else if(on['candidate']) {
+            else if (on['candidate']) {
                 this.addIceCandidate(on['candidate']);
             }
         });
@@ -88,7 +89,7 @@ class VideoChat extends Component {
         console.log(e);
     }
 
-    addIceCandidate = candidate=> {
+    addIceCandidate = candidate => {
         this.state.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
@@ -119,6 +120,14 @@ class VideoChat extends Component {
         }).catch(this.error);
     }
 
+    toggleVideo = () => {
+        this.localRef.current.srcObject.getVideoTracks()[0].enabled = !this.localRef.current.srcObject.getVideoTracks()[0].enabled;
+    }
+
+    toggleAudio = () => {
+        this.localRef.current.srcObject.getAudioTracks()[0].enabled = !this.localRef.current.srcObject.getAudioTracks()[0].enabled;
+    }
+
     render() {
         return (
             <React.Fragment>
@@ -127,7 +136,11 @@ class VideoChat extends Component {
                         <div className={styles.remote}>
                             <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
                             <div className={styles.local}>
-                                <video className={styles.localVideo} ref={this.localRef} autoPlay={true}></video>
+                                <video className={styles.localVideo} ref={this.localRef} autoPlay={true} muted={true}></video>
+                            </div>
+                            <div className={styles.controls}>
+                                <button onClick={this.toggleVideo}>Video</button>
+                                <button onClick={this.toggleAudio}>Audio</button>
                             </div>
                         </div>
                     </div>
