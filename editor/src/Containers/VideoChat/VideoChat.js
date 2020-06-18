@@ -15,6 +15,11 @@ class VideoChat extends Component {
         this.state = {
             videoSocket: null,
             pc: null,
+            controls: {
+                video: true,
+                audio: true
+            },
+            peerConnected: false,
         }
     }
 
@@ -37,10 +42,14 @@ class VideoChat extends Component {
         };
 
         // Initializes media stream.
+        let localMediaStream = null;
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
-            this.localRef.current.srcObject = mediaStream;
-            //this.remoteRef.current.srcObject = mediaStream;
+
+            // this.localRef.current.srcObject = mediaStream;
+            this.remoteRef.current.srcObject = mediaStream;
+            localMediaStream = mediaStream;
+
             mediaStream.getTracks().forEach(track => {
                 this.state.pc.addTrack(track, mediaStream);
             });
@@ -54,7 +63,7 @@ class VideoChat extends Component {
                 console.log('offer made');
                 // other person listens to offerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
-                    this.createAnswer();
+                    this.createAnswer(localMediaStream);
                 }).catch(this.error);
 
             }
@@ -63,6 +72,8 @@ class VideoChat extends Component {
                 // I listen to answerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
                     console.log('remote description set')
+                    this.localRef.current.srcObject = localMediaStream;
+                    this.setState({ peerConnected: true });
                 }).catch(this.error);
             }
             else if (on['candidate']) {
@@ -111,37 +122,50 @@ class VideoChat extends Component {
         }).catch(this.error);
     }
 
-    createAnswer = () => {
+    createAnswer = (localMediaStream) => {
         console.log('answer');
         this.state.pc.createAnswer().then(sdp => {
             this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
                 this.state.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
+                this.localRef.current.srcObject = localMediaStream;
+                this.setState({ peerConnected: true });
             }).catch(this.error)
         }).catch(this.error);
     }
 
     toggleVideo = () => {
-        this.localRef.current.srcObject.getVideoTracks()[0].enabled = !this.localRef.current.srcObject.getVideoTracks()[0].enabled;
+        const controls = { ...this.state.controls };
+        this.localRef.current.srcObject.getVideoTracks()[0].enabled = !controls.video;
+        this.setState({ controls: { video: !controls.video, audio: controls.audio } });
     }
 
     toggleAudio = () => {
-        this.localRef.current.srcObject.getAudioTracks()[0].enabled = !this.localRef.current.srcObject.getAudioTracks()[0].enabled;
+        const controls = { ...this.state.controls };
+        this.localRef.current.srcObject.getAudioTracks()[0].enabled = !controls.audio;
+        this.setState({ controls: { ...this.state.controls, audio: !controls.audio } });
     }
 
     render() {
+        const { controls, peerConnected } = this.state;
         return (
             <React.Fragment>
                 <Draggable nodeRef={this.draggableRef} defaultPosition={{ x: 900, y: 0 }}>
                     <div className={styles.outer} ref={this.draggableRef}>
                         <div className={styles.remote}>
-                            <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true}></video>
+                            <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true} muted={!peerConnected}></video>
                             <div className={styles.local}>
                                 <video className={styles.localVideo} ref={this.localRef} autoPlay={true} muted={true}></video>
                             </div>
+                            {peerConnected &&
                             <div className={styles.controls}>
-                                <button onClick={this.toggleVideo}>Video</button>
-                                <button onClick={this.toggleAudio}>Audio</button>
+                                <button onClick={this.toggleVideo}>
+                                    {controls.video ? "Video On" : "Video Off"}
+                                </button>
+                                <button onClick={this.toggleAudio}>
+                                    {controls.audio ? "Audio On" : "Audio Off"}
+                                </button>
                             </div>
+    }
                         </div>
                     </div>
                 </Draggable>
