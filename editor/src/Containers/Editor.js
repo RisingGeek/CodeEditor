@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import EditorComponent from '../Components/EditorComponent';
+import EditorComponent from '../Components/Editor/EditorComponent';
 import axios from 'axios';
-
 // automatically reconnects if the connection is closed
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
 import VideoChat from './VideoChat/VideoChat';
+import { Row, Col } from 'antd';
+import SideDrawer from '../Components/SideDrawer/SideDrawer';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -93,21 +94,29 @@ class Editor extends Component {
     }
 
     render() {
+        const { visible } = this.state;
         return (
-            <React.Fragment>
-                <VideoChat />
-                <EditorComponent
-                    code={this.state.code}
-                    input={this.state.input}
-                    output={this.state.output}
-                    lang={this.state.lang}
-                    editorDidMount={this.editorDidMount}
-                    editorOnChange={this.editorOnChange}
-                    handleRun={this.handleRun}
-                    handleInput={this.handleInput}
-                    handleLang={this.handleLang}
-                />
-            </React.Fragment>
+            <Row gutter={0}>
+                <Col span={20}>
+                    <EditorComponent
+                        code={this.state.code}
+                        lang={this.state.lang}
+                        editorDidMount={this.editorDidMount}
+                        editorOnChange={this.editorOnChange}
+                    />
+                </Col>
+                <Col span={4}>
+                    <SideDrawer
+                        input={this.state.input}
+                        output={this.state.output}
+                        handleLang={this.handleLang}
+                        handleRun={this.handleRun}
+                        handleInput={this.handleInput}
+                    />
+                    {/* <VideoChat /> */}
+                </Col>
+
+            </Row>
         );
     }
 }

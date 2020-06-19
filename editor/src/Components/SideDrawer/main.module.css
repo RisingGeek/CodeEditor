@@ -1,0 +1,14 @@
+.sideDrawer {
+    background: #000000bf;
+    height: 100vh;
+    padding: 15px;
+}
+
+.sideDrawer > * {
+    display: block;
+    margin-top: 10px;
+}
+
+.input, .output {
+    color: white;
+}

@@ -149,7 +149,7 @@ class VideoChat extends Component {
         const { controls, peerConnected } = this.state;
         return (
             <React.Fragment>
-                <Draggable nodeRef={this.draggableRef} defaultPosition={{ x: 900, y: 0 }}>
+                <Draggable nodeRef={this.draggableRef} >
                     <div className={styles.outer} ref={this.draggableRef}>
                         <div className={styles.remote}>
                             <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true} muted={!peerConnected}></video>
