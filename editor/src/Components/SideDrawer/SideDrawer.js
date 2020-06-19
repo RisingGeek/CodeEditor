@@ -5,7 +5,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const SideDrawer = props => {
-    const { handleLang, lang, handleRun, handleInput, input, output } = props;
+    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat } = props;
     const textAreaSize = { minRows: 3, maxRows: 6 };
     return (
         <div className={styles.sideDrawer}>
@@ -19,6 +19,7 @@ const SideDrawer = props => {
             <label className={styles.output}>Output:</label>
             <TextArea value={output} style={{ marginBottom: '20px' }} autoSize={textAreaSize} readOnly={true} />
             <button onClick={handleRun}>run code</button>
+            <button onClick={handleVideoChat}>Video Chat</button>
         </div>
     );
 }

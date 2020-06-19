@@ -169,7 +169,7 @@ class VideoChat extends Component {
                         </div>
                     </div>
                 </Draggable>
-                <button onClick={this.createOffer}>video chat</button>
+                {/* <button onClick={this.createOffer}>video chat</button> */}
             </React.Fragment>
         );
     }

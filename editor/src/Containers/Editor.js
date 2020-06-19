@@ -23,6 +23,7 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
+            videoChat: false,
         }
     }
 
@@ -93,11 +94,18 @@ class Editor extends Component {
         this.setState({ lang: value });
     }
 
+    handleVideoChat = () => {
+        this.setState({ videoChat: true });
+        console.log('here')
+    }
+
     render() {
-        const { visible } = this.state;
+        const { videoChat } = this.state;
+        console.log(videoChat)
         return (
             <Row gutter={0}>
                 <Col span={20}>
+                    {videoChat && <VideoChat />}
                     <EditorComponent
                         code={this.state.code}
                         lang={this.state.lang}
@@ -112,8 +120,8 @@ class Editor extends Component {
                         handleLang={this.handleLang}
                         handleRun={this.handleRun}
                         handleInput={this.handleInput}
+                        handleVideoChat={this.handleVideoChat}
                     />
-                    {/* <VideoChat /> */}
                 </Col>
 
             </Row>
