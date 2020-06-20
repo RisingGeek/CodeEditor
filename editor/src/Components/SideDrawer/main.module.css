@@ -1,7 +1,7 @@
 .sideDrawer {
     background: #000000bf;
     height: 100vh;
-    padding: 15px;
+    padding: 25px;
 }
 
 .sideDrawer > * {

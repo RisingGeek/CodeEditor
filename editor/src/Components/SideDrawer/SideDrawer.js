@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './main.module.css';
 import { Select, Input } from 'antd';
+import VideoChat from '../../Containers/VideoChat/VideoChat'
 const { Option } = Select;
 const { TextArea } = Input;
 
 const SideDrawer = props => {
-    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat } = props;
+    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat,videoChat } = props;
     const textAreaSize = { minRows: 3, maxRows: 6 };
     return (
         <div className={styles.sideDrawer}>
@@ -19,7 +20,8 @@ const SideDrawer = props => {
             <label className={styles.output}>Output:</label>
             <TextArea value={output} style={{ marginBottom: '20px' }} autoSize={textAreaSize} readOnly={true} />
             <button onClick={handleRun}>run code</button>
-            <button onClick={handleVideoChat}>Video Chat</button>
+            <button onClick={handleVideoChat}>Start Camera</button>
+            {videoChat && <VideoChat />}
         </div>
     );
 }

@@ -5,7 +5,6 @@ import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
-import VideoChat from './VideoChat/VideoChat';
 import { Row, Col } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
 
@@ -105,7 +104,7 @@ class Editor extends Component {
         return (
             <Row gutter={0}>
                 <Col span={20}>
-                    {videoChat && <VideoChat />}
+                    
                     <EditorComponent
                         code={this.state.code}
                         lang={this.state.lang}
@@ -117,6 +116,7 @@ class Editor extends Component {
                     <SideDrawer
                         input={this.state.input}
                         output={this.state.output}
+                        videoChat={videoChat}
                         handleLang={this.handleLang}
                         handleRun={this.handleRun}
                         handleInput={this.handleInput}
