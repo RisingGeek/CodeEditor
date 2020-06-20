@@ -3,7 +3,7 @@ import MonacoEditor from 'react-monaco-editor';
 import styles from './main.module.css';
 
 const EditorComponent = props => {
-    const { code, input, output, editorDidMount, editorOnChange, lang } = props;
+    const { code, editorDidMount, editorOnChange, lang } = props;
     const options = {
         selectOnLineNumbers: true, // Select line by clicking on line number
         minimap: {

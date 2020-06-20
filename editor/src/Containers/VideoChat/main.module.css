@@ -1,6 +1,6 @@
 .outer {
   position:absolute;
-  width:80%;
+  width:20%;
   height:auto;
   z-index: 1;
 }
@@ -21,6 +21,10 @@
 .remoteVideo, .localVideo {
   width: 100%;
   height: auto;
+}
+
+.connect {
+  position: absolute;
 }
 
 .controls {

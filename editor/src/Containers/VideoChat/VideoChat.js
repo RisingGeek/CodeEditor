@@ -157,19 +157,24 @@ class VideoChat extends Component {
                                 <video className={styles.localVideo} ref={this.localRef} autoPlay={true} muted={true}></video>
                             </div>
                             {peerConnected &&
-                            <div className={styles.controls}>
-                                <button onClick={this.toggleVideo}>
-                                    {controls.video ? "Video On" : "Video Off"}
-                                </button>
-                                <button onClick={this.toggleAudio}>
-                                    {controls.audio ? "Audio On" : "Audio Off"}
-                                </button>
-                            </div>
-    }
+                                <div className={styles.controls}>
+                                    <button onClick={this.toggleVideo}>
+                                        {controls.video ? "Video On" : "Video Off"}
+                                    </button>
+                                    <button onClick={this.toggleAudio}>
+                                        {controls.audio ? "Audio On" : "Audio Off"}
+                                    </button>
+                                </div>
+                            }
+                            {!peerConnected &&
+                                <div className={styles.connect}>
+                                    <button onClick={this.createOffer}>start call</button>
+                                </div>
+                            }
                         </div>
+
                     </div>
                 </Draggable>
-                <button onClick={this.createOffer}>video chat</button>
             </React.Fragment>
         );
     }

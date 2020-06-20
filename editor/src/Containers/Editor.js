@@ -7,6 +7,7 @@ import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
 import { Row, Col } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
+import VideoChat from './VideoChat/VideoChat';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -100,11 +101,10 @@ class Editor extends Component {
 
     render() {
         const { videoChat } = this.state;
-        console.log(videoChat)
         return (
             <Row gutter={0}>
                 <Col span={20}>
-                    
+                {videoChat && <VideoChat />}
                     <EditorComponent
                         code={this.state.code}
                         lang={this.state.lang}

@@ -5,8 +5,12 @@
 }
 
 .sideDrawer > * {
+    /* display: block; */
+    margin-bottom: 10px;
+}
+
+.lang {
     display: block;
-    margin-top: 10px;
 }
 
 .input, .output {
