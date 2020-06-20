@@ -17,9 +17,9 @@ const SideDrawer = props => {
     )
     return (
         <div className={styles.sideDrawer}>
-            <Row>
+            <Row className={styles.topRow}>
                 <Col span={12}>
-                    <button onClick={handleVideoChat}>Make Call</button>
+                    <button className="btn_primary" onClick={handleVideoChat}>Make Call</button>
                 </Col>
                 <Col span={12}>
                     <Popover
@@ -27,7 +27,7 @@ const SideDrawer = props => {
                         trigger="click"
                         placement="bottomRight"
                     >
-                        <button>Invite</button>
+                        <button className="btn_primary">Invite</button>
                     </Popover>
 
                 </Col>
@@ -41,7 +41,7 @@ const SideDrawer = props => {
             <TextArea value={input} onChange={handleInput} rows={5} autoSize={textAreaSize} />
             <label className={styles.output}>Output:</label>
             <TextArea value={output} style={{ marginBottom: '20px' }} autoSize={textAreaSize} readOnly={true} />
-            <button onClick={handleRun}>run code</button>
+            <button className="btn_success" onClick={handleRun}>Run Code</button>
         </div>
     );
 }

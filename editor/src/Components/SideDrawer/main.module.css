@@ -4,8 +4,7 @@
     padding: 25px;
 }
 
-.sideDrawer > * {
-    /* display: block; */
+.sideDrawer>* {
     margin-bottom: 10px;
 }
 
@@ -15,4 +14,13 @@
 
 .input, .output {
     color: white;
+}
+
+.topRow {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.topRow button {
+    width: 90%;
 }
