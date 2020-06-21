@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {Link} from 'react-router-dom';
-import {v4} from 'uuid';
+import React, { Component } from 'react';
+import { v4 } from 'uuid';
+import HomeComponent from '../Components/Home/HomeComponent';
 
 class Home extends Component {
     createId = () => {
@@ -8,10 +8,10 @@ class Home extends Component {
     }
 
     render() {
-        return(
-            <div>
-                <Link to={`/${this.createId()}`}>create editor</Link>
-            </div>
+        return (
+            <HomeComponent
+                createId={this.createId}
+            />
         );
     }
 }

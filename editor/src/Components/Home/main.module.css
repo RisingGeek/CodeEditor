@@ -1,0 +1,29 @@
+.home {
+    background: #000000bf;
+    text-align: center;
+    padding: 5% 0%;
+}
+
+.home > * {
+    color: white;
+}
+
+.home h1 {
+    font-size: 50px;
+}
+
+.home p {
+    margin-bottom: 10px;
+}
+
+.home .heading {
+    font-size: 40px;
+}
+
+.home .description {
+    font-size: 25px;
+}
+
+.btn {
+    padding: 1% 3%;
+}
