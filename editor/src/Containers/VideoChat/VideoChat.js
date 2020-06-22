@@ -158,17 +158,17 @@ class VideoChat extends Component {
                             </div>
                             {peerConnected &&
                                 <div className={styles.controls}>
-                                    <button onClick={this.toggleVideo}>
+                                    <button className="btn_primary" onClick={this.toggleVideo}>
                                         {controls.video ? "Video On" : "Video Off"}
                                     </button>
-                                    <button onClick={this.toggleAudio}>
+                                    <button className="btn_primary" onClick={this.toggleAudio}>
                                         {controls.audio ? "Audio On" : "Audio Off"}
                                     </button>
                                 </div>
                             }
                             {!peerConnected &&
                                 <div className={styles.connect}>
-                                    <button onClick={this.createOffer}>start call</button>
+                                    <button className="btn_primary" onClick={this.createOffer}>start call</button>
                                 </div>
                             }
                         </div>

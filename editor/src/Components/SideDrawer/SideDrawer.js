@@ -5,7 +5,7 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const SideDrawer = props => {
-    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat } = props;
+    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat, runCodeDisabled } = props;
     const textAreaSize = { minRows: 3, maxRows: 6 };
     const inviteContent = (
         <div>
@@ -41,7 +41,9 @@ const SideDrawer = props => {
             <TextArea value={input} onChange={handleInput} rows={5} autoSize={textAreaSize} />
             <label className={styles.output}>Output:</label>
             <TextArea value={output} style={{ marginBottom: '20px' }} autoSize={textAreaSize} readOnly={true} />
-            <button className="btn_success" onClick={handleRun}>Run Code</button>
+            <button className="btn_success" onClick={handleRun} disabled={runCodeDisabled}>
+                {runCodeDisabled ? "Loading..." : "Run Code"}
+            </button>
         </div>
     );
 }

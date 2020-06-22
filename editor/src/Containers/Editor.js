@@ -24,6 +24,7 @@ class Editor extends Component {
             monaco: null,
             binding: null,
             videoChat: false,
+            runCodeDisabled: false,
         }
     }
 
@@ -64,6 +65,7 @@ class Editor extends Component {
 
     // Handler for Run Code button
     handleRun = () => {
+        this.setState({ runCodeDisabled: true });
         // Convert array of codes into a single string
         const code = this.state.editor.getValue();
         // Send API call to run code
@@ -74,12 +76,12 @@ class Editor extends Component {
             lang: this.state.editor.getModel().getLanguageIdentifier().language
         }).then(response => {
             this.state.binding._inoutListener(this.state.output, response.data, 'output');
-            this.setState({ output: response.data });
+            this.setState({ output: response.data, runCodeDisabled: false });
 
         }).catch(err => {
             if (err.response.status === 400) {
                 this.state.binding._inoutListener(this.state.output, err.response.data, 'output');
-                this.setState({ output: err.response.data });
+                this.setState({ output: err.response.data, runCodeDisabled: false });
             }
         })
     }
@@ -104,7 +106,7 @@ class Editor extends Component {
         return (
             <Row gutter={0}>
                 <Col span={20}>
-                {videoChat && <VideoChat />}
+                    {videoChat && <VideoChat />}
                     <EditorComponent
                         code={this.state.code}
                         lang={this.state.lang}
@@ -117,13 +119,13 @@ class Editor extends Component {
                         input={this.state.input}
                         output={this.state.output}
                         videoChat={videoChat}
+                        runCodeDisabled={this.state.runCodeDisabled}
                         handleLang={this.handleLang}
                         handleRun={this.handleRun}
                         handleInput={this.handleInput}
                         handleVideoChat={this.handleVideoChat}
                     />
                 </Col>
-
             </Row>
         );
     }
