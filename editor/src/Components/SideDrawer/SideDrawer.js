@@ -33,8 +33,9 @@ const SideDrawer = props => {
                 </Col>
             </Row>
             <Select defaultValue='cpp' onChange={handleLang} value={lang} className={styles.lang}>
-                <Option value='cpp'>CPP</Option>
+                <Option value='cpp'>Cpp</Option>
                 <Option value='java'>Java</Option>
+                <Option value='python'>Python 2.x</Option>
             </Select>
 
             <label className={styles.input}>Input:</label>

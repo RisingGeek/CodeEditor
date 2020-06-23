@@ -13,12 +13,14 @@ router.post('/run', (req, res) => {
     // Extension of source code file
     const sourceExt = {
         'cpp': '.cpp',
-        'java': '.java'
+        'java': '.java',
+        'python': '.py',
     }
     // Compile and run command
     const command = {
         'cpp': `cd ${id} && g++ Main.cpp -o out && ./out < input.txt`,
-        'java': `cd ${id} && javac Main.java && java Main < input.txt`
+        'java': `cd ${id} && javac Main.java && java Main < input.txt`,
+        'python': `cd ${id} && python Main.py < input.txt`,
     }
 
     // Step 1: Make unique directory and 2 files inside directory and copy source code and input to it. 

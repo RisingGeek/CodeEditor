@@ -24,6 +24,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Operational_transformatio
 ## Languages currently supported:
    - C++
    - Java
+   - Python 2.x
 
 ## Completed Features:
    - **Real Time Editing:** Edit code in a real time monaco editor. Input and output are also real time.
@@ -32,7 +33,7 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Operational_transformatio
    - **Video Calling:** Users can interact via video calling.
 
 ## Features ToDo List 
-   - **Support for more languages:** Code pair currently supports C++ and Java language.
+   - **Support for more languages:** Code pair currently supports C++, Java and Python.
    - **Rich text presence:** Highlight the cursor position of other user.
    - **Select questions from HackerRank and run all test cases:** Users can select questions from HackerRank and run all test cases against it (Maybe HackerRank provides an API for running all test cases).
    - **Proctoring control:** Detect when any user leaves the tab.
