@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import Draggable from 'react-draggable';
 import styles from './main.module.css';
+import { notification } from 'antd';
 
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
@@ -107,6 +108,10 @@ class VideoChat extends Component {
     // Handles error by logging a message to the console with the error message.
     handleLocalMediaStreamError = (error) => {
         console.log('navigator.getUserMedia error: ', error);
+        notification.error({
+            message: error.toString(),
+            description: 'Please allow access to camera and microphone',
+        })
     }
 
     error = (err) => {
