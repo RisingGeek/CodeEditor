@@ -97,7 +97,7 @@ class Editor extends Component {
     }
 
     handleVideoChat = () => {
-        this.setState({ videoChat: true });
+        this.setState({ videoChat: !this.state.videoChat });
     }
 
     render() {
@@ -105,7 +105,9 @@ class Editor extends Component {
         return (
             <Row gutter={0}>
                 <Col span={20}>
-                    {videoChat && <VideoChat />}
+                    {videoChat && <VideoChat
+                        handleVideoChat={this.handleVideoChat}
+                    />}
                     <EditorComponent
                         code={this.state.code}
                         lang={this.state.lang}

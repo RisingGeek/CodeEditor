@@ -79,7 +79,6 @@ server.on('upgrade', (request, socket, head) => {
 
 app.post('/', (req, res) => {
     let id = req.body.id;
-    console.log(id);
     // doc->shareDB.Doc instance
     // examples-> connection name, textarea-> document id
     const doc = connection.get('examples', id);

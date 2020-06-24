@@ -30,3 +30,18 @@
     background: transparent;
     border: 2px solid #1890ff;
 }
+
+.btn_danger {
+    background: red;
+    border: 2px solid transparent;
+    color: white;
+    padding: 1px 5px;
+    cursor: pointer;
+    outline: none;
+    transition: linear 0.2s;
+}
+
+.btn_danger:hover {
+    background: transparent;
+    border: 2px solid red;
+}

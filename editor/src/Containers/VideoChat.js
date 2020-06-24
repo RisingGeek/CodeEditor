@@ -84,6 +84,15 @@ class VideoChat extends Component {
         this.setState({ videoSocket, pc });
     }
 
+    componentWillUnmount() {
+        if (this.localRef.current.srcObject)
+            this.localRef.current.srcObject.getTracks().forEach(track => track.stop());
+        if (this.remoteRef.current.srcObject)
+            this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
+        this.state.pc.close();
+        this.state.videoSocket.close();
+    }
+
     addTrack = event => {
         console.log('connect to peer');
         this.remoteRef.current.srcObject = event.streams[0];
@@ -97,7 +106,9 @@ class VideoChat extends Component {
     }
 
     onIceConnectionStateChange = e => {
-        console.log(e);
+        if (this.state.pc.iceConnectionState === 'disconnected') {
+            this.props.handleVideoChat();
+        }
     }
 
     addIceCandidate = candidate => {
@@ -155,6 +166,7 @@ class VideoChat extends Component {
             <VideoChatComponent
                 draggableRef={this.draggableRef}
                 remoteRef={this.remoteRef}
+                localRef={this.localRef}
                 peerConnected={peerConnected}
                 controls={controls}
                 toggleVideo={this.toggleVideo}

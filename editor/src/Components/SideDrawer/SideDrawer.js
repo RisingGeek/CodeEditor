@@ -5,7 +5,17 @@ const { Option } = Select;
 const { TextArea } = Input;
 
 const SideDrawer = props => {
-    const { input, output, lang, handleLang, handleRun, handleInput, handleVideoChat, runCodeDisabled } = props;
+    const {
+        input,
+        output,
+        videoChat,
+        lang,
+        handleLang,
+        handleRun,
+        handleInput,
+        handleVideoChat,
+        runCodeDisabled
+    } = props;
     const textAreaSize = { minRows: 3, maxRows: 6 };
     const inviteContent = (
         <div>
@@ -19,7 +29,12 @@ const SideDrawer = props => {
         <div className={styles.sideDrawer}>
             <Row className={styles.topRow}>
                 <Col span={12}>
-                    <button className="btn_primary" onClick={handleVideoChat}>Make Call</button>
+                    <button
+                        className={videoChat ? "btn_danger" : "btn_primary"}
+                        onClick={handleVideoChat}
+                    >
+                        {videoChat ? "End Call" : "Video Call"}
+                    </button>
                 </Col>
                 <Col span={12}>
                     <Popover
