@@ -37,9 +37,7 @@ wss.on('connection', ws => {
 videoSocket.on('connection', ws => {
     ws.on('message', data => {
         const on = JSON.parse(data);
-        // console.log(on)
         if (on['makeOffer']) {
-            // console.log(on['offer']);
             videoSocket.clients.forEach(client => {
                 if (client != ws)
                     client.send(JSON.stringify({ offerMade: { offer: on['makeOffer'].offer } }));
@@ -65,7 +63,6 @@ const connection = share.connect();
 const server = app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
 server.on('upgrade', (request, socket, head) => {
     const pathname = url.parse(request.url).pathname;
-    // console.log(pathname)
 
     if (pathname === '/foo') {
         videoSocket.handleUpgrade(request, socket, head, (ws) => {
@@ -83,7 +80,6 @@ server.on('upgrade', (request, socket, head) => {
 app.post('/', (req, res) => {
     let id = req.body.id;
     console.log(id);
-    // console.log(id);
     // doc->shareDB.Doc instance
     // examples-> connection name, textarea-> document id
     const doc = connection.get('examples', id);
@@ -91,7 +87,7 @@ app.post('/', (req, res) => {
     doc.fetch(err => {
         if (err) throw err;
         // If doc type is null, create a document
-        console.log(doc.type)
+        // console.log(doc.type)
         if (doc.type == null) {
             doc.create({ content: '', output: [''], input: [''], lang: [''] });
             return;

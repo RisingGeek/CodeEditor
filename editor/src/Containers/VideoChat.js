@@ -1,8 +1,7 @@
 import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import Draggable from 'react-draggable';
-import styles from './main.module.css';
 import { notification } from 'antd';
+import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
 
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
@@ -153,34 +152,15 @@ class VideoChat extends Component {
     render() {
         const { controls, peerConnected } = this.state;
         return (
-            <React.Fragment>
-                <Draggable nodeRef={this.draggableRef} >
-                    <div className={styles.outer} ref={this.draggableRef}>
-                        <div className={styles.remote}>
-                            <video className={styles.remoteVideo} ref={this.remoteRef} autoPlay={true} muted={!peerConnected}></video>
-                            <div className={styles.local}>
-                                <video className={styles.localVideo} ref={this.localRef} autoPlay={true} muted={true}></video>
-                            </div>
-                            {peerConnected &&
-                                <div className={styles.controls}>
-                                    <button className="btn_primary" onClick={this.toggleVideo}>
-                                        {controls.video ? "Video On" : "Video Off"}
-                                    </button>
-                                    <button className="btn_primary" onClick={this.toggleAudio}>
-                                        {controls.audio ? "Audio On" : "Audio Off"}
-                                    </button>
-                                </div>
-                            }
-                            {!peerConnected &&
-                                <div className={styles.connect}>
-                                    <button className="btn_primary" onClick={this.createOffer}>start call</button>
-                                </div>
-                            }
-                        </div>
-
-                    </div>
-                </Draggable>
-            </React.Fragment>
+            <VideoChatComponent
+                draggableRef={this.draggableRef}
+                remoteRef={this.remoteRef}
+                peerConnected={peerConnected}
+                controls={controls}
+                toggleVideo={this.toggleVideo}
+                toggleAudio={this.toggleAudio}
+                createOffer={this.createOffer}
+            />
         );
     }
 }

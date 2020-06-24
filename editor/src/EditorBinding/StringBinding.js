@@ -36,7 +36,7 @@ class StringBinding extends TextDiffBinding {
     if (op.length > 1) {
       throw new Error('Op with multiple components emitted');
     }
-    console.log(op, source);
+    // console.log(op, source);
     let component = op[0];
     if (component.p[0] === 'output' || component.p[0] === 'input' || component.p[0] === 'lang') {
       this.updateInputOutput(component.ld, component.li, component.p[0]);

@@ -7,7 +7,7 @@ import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
 import { Row, Col } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
-import VideoChat from './VideoChat/VideoChat';
+import VideoChat from './VideoChat';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -98,7 +98,6 @@ class Editor extends Component {
 
     handleVideoChat = () => {
         this.setState({ videoChat: true });
-        console.log('here')
     }
 
     render() {
