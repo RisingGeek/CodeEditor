@@ -121,6 +121,7 @@ class Editor extends Component {
                         output={this.state.output}
                         videoChat={videoChat}
                         runCodeDisabled={this.state.runCodeDisabled}
+                        lang={this.state.lang}
                         handleLang={this.handleLang}
                         handleRun={this.handleRun}
                         handleInput={this.handleInput}
