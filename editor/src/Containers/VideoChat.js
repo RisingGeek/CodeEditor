@@ -30,7 +30,13 @@ class VideoChat extends Component {
             console.log('connected to video server')
         });
 
-        let pc = new window.RTCPeerConnection();
+        let pc = new window.RTCPeerConnection({
+            iceServers: [
+                {
+                    urls: 'stun:stun.l.google.com:19302?transport=udp'
+                }
+            ]
+        });
 
         pc.ontrack = this.addTrack;
         pc.onicecandidate = this.onIceCandidate;
@@ -106,12 +112,14 @@ class VideoChat extends Component {
     }
 
     onIceConnectionStateChange = e => {
+        console.log(e);
         if (this.state.pc.iceConnectionState === 'disconnected') {
             this.props.handleVideoChat();
         }
     }
 
     addIceCandidate = candidate => {
+        console.log('adding candidate', candidate)
         this.state.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
