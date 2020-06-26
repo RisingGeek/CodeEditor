@@ -45,3 +45,13 @@
     background: transparent;
     border: 2px solid red;
 }
+
+.cursor-position {
+    background: red;
+    width: 2px !important;
+}
+
+.cursor-selection {
+    background: red;
+    opacity: 0.5;
+}

@@ -8,21 +8,21 @@ class TextDiffBinding {
   onInput = (newValue, e) => {
     let previous = this.doc.data[this.path[0]];
     // Monaco Editor considers new line as \r\n.
-    let value = newValue; 
+    let value = newValue;
     if (previous === value) return;
 
     let start = 0;
     let end = 0;
-      while (previous.charAt(start) === value.charAt(start)) {
-        start++;
-      }
-      while (
-        previous.charAt(previous.length - 1 - end) === value.charAt(value.length - 1 - end) &&
-        end + start < previous.length &&
-        end + start < value.length
-      ) {
-        end++;
-      }
+    while (previous.charAt(start) === value.charAt(start)) {
+      start++;
+    }
+    while (
+      previous.charAt(previous.length - 1 - end) === value.charAt(value.length - 1 - end) &&
+      end + start < previous.length &&
+      end + start < value.length
+    ) {
+      end++;
+    }
     if (previous.length !== start + end) {
       let removed = previous.slice(start, previous.length - end);
       this._remove(start, removed, e.changes[0].rangeOffset);
@@ -77,9 +77,23 @@ class TextDiffBinding {
 
   update = (isSetup) => {
     let value = this.doc.data[this.path[0]];
-    this.compoThis.setState({ code: value });
+    this.compoThis.setState({ code: value }, () => {
+      // console.log(this.compoThis)
+      if (this.compoThis.state.range) {
+        let range = this.compoThis.state.range;
+        let isPos = range.startLineNumber === range.endLineNumber &&
+          range.startColumn === range.endColumn;
+        let decorations = this.compoThis.state.editor.deltaDecorations(this.compoThis.state.decorations, [
+          {
+            range: new this.compoThis.state.monaco.Range(range.startLineNumber, range.startColumn,
+              range.endLineNumber, range.endColumn),
+            options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
+          }
+        ]);
+      }
+    });
   };
-  
+
 }
 export default TextDiffBinding;
 

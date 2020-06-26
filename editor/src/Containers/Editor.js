@@ -27,6 +27,8 @@ class Editor extends Component {
             localPresence: null,
             videoChat: false,
             runCodeDisabled: false,
+            decorations: [],
+            range: null,
         }
     }
 
@@ -51,8 +53,21 @@ class Editor extends Component {
                 let localPresence = presence.create(presenceId);
 
                 presence.on('receive', (id, range) => {
-                    console.log({id});
-                    console.log({range});
+                    if (!range) return;
+                    // console.log({ range });
+
+                    // console.log(this.state.decorations)
+                    let isPos = range.startLineNumber === range.endLineNumber && 
+                    range.startColumn === range.endColumn;
+                    let decorations = this.state.editor.deltaDecorations(this.state.decorations, [
+                        {
+                            range: new this.state.monaco.Range(range.startLineNumber, range.startColumn,
+                                range.endLineNumber, range.endColumn),
+                            options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
+                        }
+                    ]);
+                    console.log(this.state.editor.getModel().getAllDecorations())
+                    this.setState({ decorations: decorations, range: range })
                 });
 
 
@@ -72,6 +87,13 @@ class Editor extends Component {
 
         editor.onDidChangeCursorSelection((e) => {
             console.log(e);
+            console.log(editor.getPosition())
+            console.log(this.state.editor.getSelection())
+            if (this.state.localPresence) {
+                this.state.localPresence.submit(e.selection, err => {
+                    if (err) throw err;
+                });
+            }
         });
         this.setState({ editor, monaco })
     }
@@ -79,9 +101,6 @@ class Editor extends Component {
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
         this.state.binding._inputListener(newValue, e);
-        this.state.localPresence.submit(e, err => {
-            if (err) throw err;
-        })
         this.setState({ code: newValue });
     }
 
