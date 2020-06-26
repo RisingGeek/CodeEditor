@@ -17,7 +17,7 @@ const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 
 
 // shareDB server instance
-const share = new shareDB();
+const share = new shareDB({presence: true});
 
 const app = express();
 app.use(cors());
@@ -86,7 +86,7 @@ app.post('/', (req, res) => {
     doc.fetch(err => {
         if (err) throw err;
         // If doc type is null, create a document
-        // console.log(doc.type)
+        console.log(doc.type)
         if (doc.type == null) {
             doc.create({ content: '', output: [''], input: [''], lang: [''] });
             return;

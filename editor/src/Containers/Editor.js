@@ -8,6 +8,7 @@ import StringBinding from '../EditorBinding/StringBinding';
 import { Row, Col } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
 import VideoChat from './VideoChat';
+import ObjectID from 'bson-objectid';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -23,6 +24,7 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
+            localPresence: null,
             videoChat: false,
             runCodeDisabled: false,
         }
@@ -41,9 +43,22 @@ class Editor extends Component {
 
             doc.subscribe((err) => {
                 if (err) throw err;
+                const presence = connection.getPresence('examples');
+                presence.subscribe(err => {
+                    if (err) throw err;
+                });
+                let presenceId = new ObjectID().toString();
+                let localPresence = presence.create(presenceId);
+
+                presence.on('receive', (id, range) => {
+                    console.log({id});
+                    console.log({range});
+                });
+
+
                 let binding = new StringBinding(this, doc, ['content']);
                 binding.setup(this);
-                this.setState({ binding });
+                this.setState({ binding, localPresence: localPresence });
             });
         }).catch(err => {
             console.log('some error occured');
@@ -54,12 +69,19 @@ class Editor extends Component {
         editor.focus();
         // Set end of line preference
         editor.getModel().pushEOL(0);
+
+        editor.onDidChangeCursorSelection((e) => {
+            console.log(e);
+        });
         this.setState({ editor, monaco })
     }
 
     // Monaco editor onChange()
     editorOnChange = (newValue, e) => {
         this.state.binding._inputListener(newValue, e);
+        this.state.localPresence.submit(e, err => {
+            if (err) throw err;
+        })
         this.setState({ code: newValue });
     }
 
