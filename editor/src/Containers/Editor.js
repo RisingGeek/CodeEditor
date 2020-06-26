@@ -64,7 +64,7 @@ class Editor extends Component {
                             options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
                         }
                     ]);
-                    console.log(this.state.editor.getModel().getAllDecorations())
+                    // console.log(this.state.editor.getModel().getAllDecorations())
                     this.setState({ decorations: decorations, range: range })
                 });
 
@@ -92,7 +92,7 @@ class Editor extends Component {
                 setup = false;
                 return;
             }
-            console.log(e);
+            // console.log(e);
             if (this.state.localPresence) {
                 this.state.localPresence.submit(e.selection, err => {
                     if (err) throw err;
