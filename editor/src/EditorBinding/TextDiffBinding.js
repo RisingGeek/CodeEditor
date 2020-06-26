@@ -78,7 +78,7 @@ class TextDiffBinding {
   update = (isSetup) => {
     let value = this.doc.data[this.path[0]];
     this.compoThis.setState({ code: value }, () => {
-      // console.log(this.compoThis)
+      // Update peer cursor
       if (this.compoThis.state.range) {
         let range = this.compoThis.state.range;
         let isPos = range.startLineNumber === range.endLineNumber &&

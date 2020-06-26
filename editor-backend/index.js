@@ -86,7 +86,7 @@ app.post('/', (req, res) => {
     doc.fetch(err => {
         if (err) throw err;
         // If doc type is null, create a document
-        console.log(doc.type)
+        // console.log(doc.type)
         if (doc.type == null) {
             doc.create({ content: '', output: [''], input: [''], lang: [''] });
             return;

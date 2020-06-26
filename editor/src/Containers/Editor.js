@@ -8,7 +8,6 @@ import StringBinding from '../EditorBinding/StringBinding';
 import { Row, Col } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
 import VideoChat from './VideoChat';
-import ObjectID from 'bson-objectid';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -49,16 +48,15 @@ class Editor extends Component {
                 presence.subscribe(err => {
                     if (err) throw err;
                 });
-                let presenceId = new ObjectID().toString();
-                let localPresence = presence.create(presenceId);
+                let localPresence = presence.create();
 
                 presence.on('receive', (id, range) => {
                     if (!range) return;
                     // console.log({ range });
 
                     // console.log(this.state.decorations)
-                    let isPos = range.startLineNumber === range.endLineNumber && 
-                    range.startColumn === range.endColumn;
+                    let isPos = range.startLineNumber === range.endLineNumber &&
+                        range.startColumn === range.endColumn;
                     let decorations = this.state.editor.deltaDecorations(this.state.decorations, [
                         {
                             range: new this.state.monaco.Range(range.startLineNumber, range.startColumn,
@@ -85,17 +83,24 @@ class Editor extends Component {
         // Set end of line preference
         editor.getModel().pushEOL(0);
 
+        let setup = true;
         editor.onDidChangeCursorSelection((e) => {
+            // Setup initial cursor position
+            if (setup) {
+                let pos = editor.getPosition();
+                editor.setSelection(new monaco.Range(pos.lineNumber, pos.column, pos.lineNumber, pos.column));
+                setup = false;
+                return;
+            }
             console.log(e);
-            console.log(editor.getPosition())
-            console.log(this.state.editor.getSelection())
             if (this.state.localPresence) {
                 this.state.localPresence.submit(e.selection, err => {
                     if (err) throw err;
                 });
             }
         });
-        this.setState({ editor, monaco })
+
+        this.setState({ editor, monaco });
     }
 
     // Monaco editor onChange()
