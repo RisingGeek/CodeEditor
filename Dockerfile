@@ -10,7 +10,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install default-jre -y
 RUN apt-get update && apt-get install default-jdk -y
-RUN apt-get update && apt-get install python-minimal
+RUN apt-get update && apt-get install python2-minimal
 COPY /editor-backend/package.json .
 COPY /editor-backend .
 CMD ["npm","start"]
