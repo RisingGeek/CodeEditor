@@ -21,6 +21,12 @@ According to [Wikipedia](https://en.wikipedia.org/wiki/Operational_transformatio
    - **[sharedb-string-binding](https://github.com/share/sharedb-string-binding):** It provides two-way binding for json0 string operations for HTML text input or textarea.
    - **[text-diff-binding](https://github.com/share/text-diff-binding):** It is used to support sharedb-string-binding. It is a base class for binding text difference data operations to and from a HTML text input or textarea.
 
+## Video Calling:
+This project doesn't use any external plugins for video calling. Instead, it uses APIs provided by WebRTC standard.
+ - A STUN server is used to get public IP address
+ - A TURN server is used to relay traffic if direct connection(peer to peer) fails. Currently, 
+   free TURN server is used for demonstration. 
+
 ## Languages currently supported:
    - C++
    - Java
