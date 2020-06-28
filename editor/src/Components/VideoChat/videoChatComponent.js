@@ -10,10 +10,11 @@ const VideoChatComponent = props => {
         controls,
         toggleVideo,
         toggleAudio,
-        createOffer } = props;
+        createOffer,
+    } = props;
     return (
         <React.Fragment>
-            <Draggable nodeRef={draggableRef} >
+            {/* <Draggable nodeRef={draggableRef} > */}
                 <div className={styles.outer} ref={draggableRef}>
                     <div className={styles.remote}>
                         <video
@@ -30,7 +31,7 @@ const VideoChatComponent = props => {
                                 muted={true}>
                             </video>
                         </div>
-                        {peerConnected &&
+                        {/* {peerConnected &&
                             <div className={styles.controls}>
                                 <button className="btn_primary" onClick={toggleVideo}>
                                     {controls.video ? "Video On" : "Video Off"}
@@ -39,21 +40,23 @@ const VideoChatComponent = props => {
                                     {controls.audio ? "Audio On" : "Audio Off"}
                                 </button>
                             </div>
-                        }
-                        {!peerConnected &&
+                        } */}
+                        {/* {!peerConnected && */}
                             <div className={styles.connect}>
                                 <button
                                     className="btn_primary"
                                     onClick={createOffer}
                                 >
-                                    start call
+                                    start
                                 </button>
                             </div>
-                        }
+                            
+                        {/* } */}
+
                     </div>
 
                 </div>
-            </Draggable>
+            {/* </Draggable> */}
         </React.Fragment>
     );
 }

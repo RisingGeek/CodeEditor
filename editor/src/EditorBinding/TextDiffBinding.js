@@ -90,6 +90,7 @@ class TextDiffBinding {
             options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
           }
         ]);
+        this.compoThis.setState({decorations: decorations});
       }
     });
   };

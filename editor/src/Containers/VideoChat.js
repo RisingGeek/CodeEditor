@@ -5,6 +5,8 @@ import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
 
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
+var candidates = [];
+
 class VideoChat extends Component {
     constructor(props) {
         super(props);
@@ -33,8 +35,13 @@ class VideoChat extends Component {
         let pc = new window.RTCPeerConnection({
             iceServers: [
                 {
-                    urls: 'stun:stun.l.google.com:19302?transport=udp'
-                }
+                    urls: 'stun:stun.l.google.com:19302'
+                },
+                {
+                    urls: 'turn:numb.viagenie.ca',
+                    username: 'webrtc@live.com',
+                    credential: 'muazkh'
+                },
             ]
         });
 
@@ -62,13 +69,13 @@ class VideoChat extends Component {
             // pc.addStream(mediaStream);
         }).catch(this.handleLocalMediaStreamError);
 
-
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
                 console.log('offer made');
                 // other person listens to offerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
+                    console.log('remote description set');
                     this.createAnswer(localMediaStream);
                 }).catch(this.error);
 
@@ -79,11 +86,14 @@ class VideoChat extends Component {
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
                     console.log('remote description set')
                     this.localRef.current.srcObject = localMediaStream;
+                    // console.log(candidates)
+                    // this.state.videoSocket.send(JSON.stringify({ candidate: candidates }));
                     this.setState({ peerConnected: true });
                 }).catch(this.error);
             }
             else if (on['candidate']) {
-                this.addIceCandidate(on['candidate']);
+                console.log(`adding ${on['candidate'].length} candidates`);
+                on['candidate'].map(candidate => this.addIceCandidate(candidate));
             }
         });
 
@@ -105,21 +115,25 @@ class VideoChat extends Component {
     }
 
     onIceCandidate = e => {
+        console.log('gathering state: ' + e.target.iceGatheringState);
         if (e.candidate) {
-            console.log(e.candidate);
-            this.state.videoSocket.send(JSON.stringify({ candidate: e.candidate }));
+            candidates.push(e.candidate);
+        }
+        else {
+            console.log(candidates)
+            this.state.videoSocket.send(JSON.stringify({ candidate: candidates }));
         }
     }
 
     onIceConnectionStateChange = e => {
-        console.log(e);
-        if (this.state.pc.iceConnectionState === 'disconnected') {
-            this.props.handleVideoChat();
-        }
+        console.log('connection state: ' + e.target.iceConnectionState);
+        // if (this.state.pc.iceConnectionState === 'disconnected') {
+        //     this.props.handleVideoChat();
+        // }
     }
 
     addIceCandidate = candidate => {
-        console.log('adding candidate', candidate)
+        // console.log('adding candidate', candidate)
         this.state.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
@@ -138,7 +152,7 @@ class VideoChat extends Component {
 
     createOffer = () => {
         console.log('offer')
-        this.state.pc.createOffer().then(sdp => {
+        this.state.pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true }).then(sdp => {
             this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
                 this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: sdp } }));
             }).catch(this.error);
