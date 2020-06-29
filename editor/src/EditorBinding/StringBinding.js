@@ -81,5 +81,5 @@ class StringBinding extends TextDiffBinding {
 
 export default StringBinding;
 
-// This code has been modified according to the needs.
+// This code has been modified to support Monaco Editor.
 // Original code of StringBinding is present at https://github.com/share/sharedb-string-binding

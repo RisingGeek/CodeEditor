@@ -48,30 +48,67 @@ class TextDiffBinding {
   onInsert = (rangeOffset, length) => {
     this._transformSelectionAndUpdate(rangeOffset, length, this.insertCursorTransform);
   };
-  insertCursorTransform = (rangeOffset, length, cursorOffset) => {
+  insertCursorTransform = (rangeOffset, currStartOffset, currEndOffset, length) => {
     //rangeOffset->rangeOffset of editor which actually edited
     //cursorOffset->rangeOffset of my editor
-    return (rangeOffset < cursorOffset) ? cursorOffset + length : cursorOffset;
+    let offset = null;
+    if (rangeOffset < currStartOffset) {
+      offset = {
+        startOffset: currStartOffset + length,
+        endOffset: currEndOffset + length
+      }
+    }
+    else {
+      offset = {
+        startOffset: currStartOffset,
+        endOffset: currEndOffset > rangeOffset ? currEndOffset + length : currEndOffset
+      }
+    }
+    return offset;
   }
 
   onRemove = (rangeOffset, length) => {
     this._transformSelectionAndUpdate(rangeOffset, length, this.removeCursorTransform);
   };
-  removeCursorTransform = (rangeOffset, length, cursorOffset) => {
+  removeCursorTransform = (rangeOffset, currStartOffset, currEndOffset, length) => {
     // rangeOffset, cursorOffset same as insertCursorTransform()
     // Taking minimum because if one user deletes text written by other(cursor position), 
     // cursorOffset will become -ve if we do cursorOffset-length
-    return (rangeOffset < cursorOffset) ? cursorOffset -= Math.min(length, cursorOffset - rangeOffset) : cursorOffset;
+    let offset = null;
+    if (rangeOffset < currStartOffset) {
+      offset = {
+        startOffset: currEndOffset < rangeOffset + length ? rangeOffset : currStartOffset - length,
+        endOffset: currEndOffset < rangeOffset + length ? rangeOffset : currEndOffset - length
+      }
+    }
+    else {
+      offset = {
+        startOffset: currStartOffset,
+        endOffset: currEndOffset > rangeOffset ? rangeOffset : currEndOffset
+      }
+    }
+    return offset;
   }
 
   _transformSelectionAndUpdate = (rangeOffset, length, transformCursor) => {
     let editor = this.compoThis.state.editor;
-    let cursorOffset = editor.getModel().getOffsetAt(editor.getPosition());
-    let startOffset = transformCursor(rangeOffset, length, cursorOffset);
+    let selection = editor.getSelection();
+    let currStartOffset = editor.getModel().getOffsetAt({
+      lineNumber: selection.startLineNumber,
+      column: selection.startColumn
+    });
+    let currEndOffset = editor.getModel().getOffsetAt({
+      lineNumber: selection.endLineNumber,
+      column: selection.endColumn
+    });
+
+    let offset = transformCursor(rangeOffset, currStartOffset, currEndOffset, length);
     this.update();
     editor.setSelection(new this.compoThis.state.monaco.Range(
-      editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column,
-      editor.getModel().getPositionAt(startOffset).lineNumber, editor.getModel().getPositionAt(startOffset).column)
+      editor.getModel().getPositionAt(offset.startOffset).lineNumber,
+      editor.getModel().getPositionAt(offset.startOffset).column,
+      editor.getModel().getPositionAt(offset.endOffset).lineNumber,
+      editor.getModel().getPositionAt(offset.endOffset).column)
     );
   };
 
@@ -90,7 +127,7 @@ class TextDiffBinding {
             options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
           }
         ]);
-        this.compoThis.setState({decorations: decorations});
+        this.compoThis.setState({ decorations: decorations });
       }
     });
   };
@@ -98,5 +135,5 @@ class TextDiffBinding {
 }
 export default TextDiffBinding;
 
-// This code has been modified according to the needs.
+// This code has been modified to support Monaco Editor.
 // Original code of StringBinding is present at https://github.com/share/text-diff-binding
