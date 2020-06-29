@@ -14,7 +14,7 @@ const VideoChatComponent = props => {
     } = props;
     return (
         <React.Fragment>
-            {/* <Draggable nodeRef={draggableRef} > */}
+            <Draggable nodeRef={draggableRef} >
                 <div className={styles.outer} ref={draggableRef}>
                     <div className={styles.remote}>
                         <video
@@ -56,7 +56,7 @@ const VideoChatComponent = props => {
                     </div>
 
                 </div>
-            {/* </Draggable> */}
+            </Draggable>
         </React.Fragment>
     );
 }

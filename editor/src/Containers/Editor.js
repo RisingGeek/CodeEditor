@@ -5,7 +5,7 @@ import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
-import { Row, Col } from 'antd';
+import { Row, Col, notification } from 'antd';
 import SideDrawer from '../Components/SideDrawer/SideDrawer';
 import VideoChat from './VideoChat';
 
@@ -74,7 +74,10 @@ class Editor extends Component {
                 this.setState({ binding, localPresence: localPresence });
             });
         }).catch(err => {
-            console.log('some error occured');
+            console.log(err)
+            notification.error({
+                message: err.toString(),
+            });
         });
     }
 
