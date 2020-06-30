@@ -22,6 +22,7 @@ class VideoChat extends Component {
                 audio: true
             },
             peerConnected: false,
+            gotMediaDevice: false,
         }
     }
 
@@ -58,6 +59,7 @@ class VideoChat extends Component {
         let localMediaStream = null;
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
+            this.setState({ videoSocket, pc, gotMediaDevice: true });
 
             // this.localRef.current.srcObject = mediaStream;
             this.remoteRef.current.srcObject = mediaStream;
@@ -95,20 +97,15 @@ class VideoChat extends Component {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => this.addIceCandidate(candidate));
             }
-            else if(on['endCall']) {
-                console.log('call ended by peer');
-                this.props.handleVideoChat();
-            }
         });
 
-        this.setState({ videoSocket, pc });
     }
 
     componentWillUnmount() {
-        // if (this.localRef.current.srcObject)
-        //     this.localRef.current.srcObject.getTracks().forEach(track => track.stop());
-        // if (this.remoteRef.current.srcObject)
-        //     this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
+        if (this.localRef.current.srcObject)
+            this.localRef.current.srcObject.getTracks().forEach(track => track.stop());
+        if (this.remoteRef.current.srcObject)
+            this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
         this.state.pc.close();
         this.state.videoSocket.close();
     }
@@ -187,7 +184,7 @@ class VideoChat extends Component {
     }
 
     render() {
-        const { controls, peerConnected } = this.state;
+        const { controls, peerConnected, gotMediaDevice } = this.state;
         return (
             <VideoChatComponent
                 draggableRef={this.draggableRef}
@@ -195,6 +192,7 @@ class VideoChat extends Component {
                 localRef={this.localRef}
                 peerConnected={peerConnected}
                 controls={controls}
+                gotMediaDevice={gotMediaDevice}
                 toggleVideo={this.toggleVideo}
                 toggleAudio={this.toggleAudio}
                 createOffer={this.createOffer}

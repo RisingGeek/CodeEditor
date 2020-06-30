@@ -57,7 +57,11 @@ const SideDrawer = props => {
             <TextArea value={input} onChange={handleInput} rows={5} autoSize={textAreaSize} />
             <label className={styles.output}>Output:</label>
             <TextArea value={output} style={{ marginBottom: '20px' }} autoSize={textAreaSize} readOnly={true} />
-            <button className="btn_success" onClick={handleRun} disabled={runCodeDisabled}>
+            <button 
+            className={`btn_success ${runCodeDisabled && 'disabled'}`} 
+            onClick={handleRun} 
+            disabled={runCodeDisabled}
+            >
                 {runCodeDisabled ? "Loading..." : "Run Code"}
             </button>
         </div>

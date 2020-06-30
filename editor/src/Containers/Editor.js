@@ -128,7 +128,13 @@ class Editor extends Component {
             this.setState({ output: response.data, runCodeDisabled: false });
 
         }).catch(err => {
-            if (err.response.status === 400) {
+            if (!err.response) {
+                notification.error({
+                    message: err.toString(),
+                });
+                this.setState({runCodeDisabled: false});
+            }
+            else if (err.response.status === 400) {
                 this.state.binding._inoutListener(this.state.output, err.response.data, 'output');
                 this.setState({ output: err.response.data, runCodeDisabled: false });
             }

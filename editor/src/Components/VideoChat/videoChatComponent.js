@@ -9,6 +9,7 @@ const VideoChatComponent = props => {
         localRef,
         peerConnected,
         controls,
+        gotMediaDevice,
         toggleVideo,
         toggleAudio,
         createOffer,
@@ -48,7 +49,7 @@ const VideoChatComponent = props => {
                                 </Row>
                             </div>
                         }
-                        {!peerConnected &&
+                        {gotMediaDevice && !peerConnected &&
                             <div className={styles.connect}>
                                 <button
                                     className="btn_primary"
