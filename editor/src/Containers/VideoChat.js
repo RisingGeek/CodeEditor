@@ -95,16 +95,20 @@ class VideoChat extends Component {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => this.addIceCandidate(candidate));
             }
+            else if(on['endCall']) {
+                console.log('call ended by peer');
+                this.props.handleVideoChat();
+            }
         });
 
         this.setState({ videoSocket, pc });
     }
 
     componentWillUnmount() {
-        if (this.localRef.current.srcObject)
-            this.localRef.current.srcObject.getTracks().forEach(track => track.stop());
-        if (this.remoteRef.current.srcObject)
-            this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
+        // if (this.localRef.current.srcObject)
+        //     this.localRef.current.srcObject.getTracks().forEach(track => track.stop());
+        // if (this.remoteRef.current.srcObject)
+        //     this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
         this.state.pc.close();
         this.state.videoSocket.close();
     }

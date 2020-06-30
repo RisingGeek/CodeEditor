@@ -17,7 +17,7 @@ const WebSocketJSONStream = require('@teamwork/websocket-json-stream');
 
 
 // shareDB server instance
-const share = new shareDB({presence: true});
+const share = new shareDB({ presence: true });
 
 const app = express();
 app.use(cors());
@@ -49,11 +49,17 @@ videoSocket.on('connection', ws => {
                     client.send(JSON.stringify({ answerMade: { answer: on['makeAnswer'].answer } }));
             })
         }
-        else if(on['candidate']) {
-            console.log(on['candidate'])
+        else if (on['candidate']) {
             videoSocket.clients.forEach(client => {
-                if(client != ws)
-                    client.send(JSON.stringify({candidate: on['candidate']}));
+                if (client != ws)
+                    client.send(JSON.stringify({ candidate: on['candidate'] }));
+            })
+        }
+        else if (on['endCall']) {
+            console.log(on)
+            videoSocket.clients.forEach(client => {
+                if (client != ws)
+                    client.send(JSON.stringify({ endCall: true }));
             })
         }
     })

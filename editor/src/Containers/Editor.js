@@ -155,6 +155,7 @@ class Editor extends Component {
             <Row gutter={0}>
                 <Col span={20}>
                     {videoChat && <VideoChat
+                        videoChat={videoChat}
                         handleVideoChat={this.handleVideoChat}
                     />}
                     <EditorComponent

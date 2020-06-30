@@ -1,13 +1,14 @@
 .outer {
-  position:absolute;
-  width:20%;
-  height:auto;
+  position: absolute;
+  width: 20%;
+  height: auto;
   z-index: 1;
 }
+
 .remote {
   position: absolute;
   width: 100%;
-  height:auto;
+  height: auto;
 }
 
 .local {
@@ -15,7 +16,7 @@
   bottom: 0;
   right: 0;
   width: 35%;
-  height:auto;
+  height: auto;
 }
 
 .remoteVideo, .localVideo {
@@ -29,4 +30,6 @@
 
 .controls {
   position: absolute;
+  width: 100%;
+  text-align: center;
 }

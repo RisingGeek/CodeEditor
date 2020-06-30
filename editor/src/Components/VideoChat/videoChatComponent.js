@@ -1,6 +1,7 @@
 import React from 'react';
 import Draggable from 'react-draggable';
 import styles from './main.module.css';
+import { Row, Col } from 'antd';
 
 const VideoChatComponent = props => {
     const { draggableRef,
@@ -31,17 +32,23 @@ const VideoChatComponent = props => {
                                 muted={true}>
                             </video>
                         </div>
-                        {/* {peerConnected &&
+                        {peerConnected &&
                             <div className={styles.controls}>
-                                <button className="btn_primary" onClick={toggleVideo}>
-                                    {controls.video ? "Video On" : "Video Off"}
-                                </button>
-                                <button className="btn_primary" onClick={toggleAudio}>
-                                    {controls.audio ? "Audio On" : "Audio Off"}
-                                </button>
+                                <Row>
+                                    <Col span={12}>
+                                        <button className="btn_primary" onClick={toggleVideo}>
+                                            {controls.video ? "Video On" : "Video Off"}
+                                        </button>
+                                    </Col>
+                                    <Col span={12}>
+                                        <button className="btn_primary" onClick={toggleAudio}>
+                                            {controls.audio ? "Audio On" : "Audio Off"}
+                                        </button>
+                                    </Col>
+                                </Row>
                             </div>
-                        } */}
-                        {/* {!peerConnected && */}
+                        }
+                        {!peerConnected &&
                             <div className={styles.connect}>
                                 <button
                                     className="btn_primary"
@@ -50,9 +57,8 @@ const VideoChatComponent = props => {
                                     start
                                 </button>
                             </div>
-                            
-                        {/* } */}
 
+                        }
                     </div>
 
                 </div>
