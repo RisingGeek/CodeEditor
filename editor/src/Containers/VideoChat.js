@@ -127,7 +127,17 @@ class VideoChat extends Component {
     }
 
     onIceConnectionStateChange = e => {
-        console.log('connection state: ' + e.target.iceConnectionState);
+        console.log('connection state: ' + this.state.pc.iceConnectionState);
+        if (this.state.pc.iceConnectionState === 'disconnected') {
+            if (this.state.pc.restartIce) {
+                console.log('restart')
+                this.state.pc.restartIce();
+            }
+            else {
+                console.log('offer restart')
+                this.createOffer();
+            }
+        }
         // if (this.state.pc.iceConnectionState === 'disconnected') {
         //     this.props.handleVideoChat();
         // }

@@ -52,9 +52,6 @@ class Editor extends Component {
 
                 presence.on('receive', (id, range) => {
                     if (!range) return;
-                    // console.log({ range });
-
-                    // console.log(this.state.decorations)
                     let isPos = range.startLineNumber === range.endLineNumber &&
                         range.startColumn === range.endColumn;
                     let decorations = this.state.editor.deltaDecorations(this.state.decorations, [
