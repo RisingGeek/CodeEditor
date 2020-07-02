@@ -2,10 +2,9 @@ import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import { notification } from 'antd';
 import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
+import VideoHelper from './VideoHelper';
 
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
-
-var candidates = [];
 
 class VideoChat extends Component {
     constructor(props) {
@@ -33,22 +32,8 @@ class VideoChat extends Component {
             console.log('connected to video server')
         });
 
-        let pc = new window.RTCPeerConnection({
-            iceServers: [
-                {
-                    urls: 'stun:stun.l.google.com:19302'
-                },
-                {
-                    urls: 'turn:numb.viagenie.ca',
-                    username: 'webrtc@live.com',
-                    credential: 'muazkh'
-                },
-            ]
-        });
-
+        let pc = VideoHelper.peerConnectionInit(videoSocket);
         pc.ontrack = this.addTrack;
-        pc.onicecandidate = this.onIceCandidate;
-        pc.oniceconnectionstatechange = this.onIceConnectionStateChange;
 
         const mediaStreamConstraints = {
             video: true,
@@ -88,14 +73,12 @@ class VideoChat extends Component {
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
                     console.log('remote description set')
                     this.localRef.current.srcObject = localMediaStream;
-                    // console.log(candidates)
-                    // this.state.videoSocket.send(JSON.stringify({ candidate: candidates }));
                     this.setState({ peerConnected: true });
                 }).catch(this.error);
             }
             else if (on['candidate']) {
                 console.log(`adding ${on['candidate'].length} candidates`);
-                on['candidate'].map(candidate => this.addIceCandidate(candidate));
+                on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
             }
         });
 
@@ -115,39 +98,6 @@ class VideoChat extends Component {
         this.remoteRef.current.srcObject = event.streams[0];
     }
 
-    onIceCandidate = e => {
-        console.log('gathering state: ' + e.target.iceGatheringState);
-        if (e.candidate) {
-            candidates.push(e.candidate);
-        }
-        else {
-            console.log(candidates)
-            this.state.videoSocket.send(JSON.stringify({ candidate: candidates }));
-        }
-    }
-
-    onIceConnectionStateChange = e => {
-        console.log('connection state: ' + this.state.pc.iceConnectionState);
-        if (this.state.pc.iceConnectionState === 'disconnected') {
-            if (this.state.pc.restartIce) {
-                console.log('restart')
-                this.state.pc.restartIce();
-            }
-            else {
-                console.log('offer restart')
-                this.createOffer();
-            }
-        }
-        // if (this.state.pc.iceConnectionState === 'disconnected') {
-        //     this.props.handleVideoChat();
-        // }
-    }
-
-    addIceCandidate = candidate => {
-        // console.log('adding candidate', candidate)
-        this.state.pc.addIceCandidate(new RTCIceCandidate(candidate));
-    }
-
     // Handles error by logging a message to the console with the error message.
     handleLocalMediaStreamError = (error) => {
         console.log('navigator.getUserMedia error: ', error);
@@ -156,18 +106,9 @@ class VideoChat extends Component {
             description: 'Please allow access to camera and microphone',
         })
     }
-
-    error = (err) => {
-        console.log('Error', err);
-    }
-
+    
     createOffer = () => {
-        console.log('offer')
-        this.state.pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: true }).then(sdp => {
-            this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
-                this.state.videoSocket.send(JSON.stringify({ makeOffer: { offer: sdp } }));
-            }).catch(this.error);
-        }).catch(this.error);
+        VideoHelper.createOffer();
     }
 
     createAnswer = (localMediaStream) => {
