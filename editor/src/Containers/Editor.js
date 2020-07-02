@@ -5,9 +5,7 @@ import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
-import { Row, Col, notification } from 'antd';
-import SideDrawer from '../Components/SideDrawer/SideDrawer';
-import VideoChat from './VideoChat';
+import {  notification } from 'antd';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -152,35 +150,22 @@ class Editor extends Component {
     }
 
     render() {
-        const { videoChat } = this.state;
+        const { videoChat, lang, code, input, output, runCodeDisabled } = this.state;
         return (
-            <Row gutter={0}>
-                <Col span={20}>
-                    {videoChat && <VideoChat
-                        videoChat={videoChat}
-                        handleVideoChat={this.handleVideoChat}
-                    />}
-                    <EditorComponent
-                        code={this.state.code}
-                        lang={this.state.lang}
-                        editorDidMount={this.editorDidMount}
-                        editorOnChange={this.editorOnChange}
-                    />
-                </Col>
-                <Col span={4}>
-                    <SideDrawer
-                        input={this.state.input}
-                        output={this.state.output}
-                        videoChat={videoChat}
-                        runCodeDisabled={this.state.runCodeDisabled}
-                        lang={this.state.lang}
-                        handleLang={this.handleLang}
-                        handleRun={this.handleRun}
-                        handleInput={this.handleInput}
-                        handleVideoChat={this.handleVideoChat}
-                    />
-                </Col>
-            </Row>
+            <EditorComponent
+                videoChat={videoChat}
+                lang={lang}
+                code={code}
+                input={input}
+                output={output}
+                runCodeDisabled={runCodeDisabled}
+                handleVideoChat={this.handleVideoChat}
+                editorDidMount={this, this.editorDidMount}
+                editorOnChange={this.editorOnChange}
+                handleLang={this.handleLang}
+                handleRun={this.handleRun}
+                handleInput={this.handleInput}
+            />
         );
     }
 }
