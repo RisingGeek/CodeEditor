@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import ReconnectingWebSocket from 'reconnecting-websocket';
-import { notification } from 'antd';
 import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
 import VideoHelper from './VideoHelper';
 
@@ -54,7 +53,7 @@ class VideoChat extends Component {
                 this.state.pc.addTrack(track, mediaStream);
             });
             // pc.addStream(mediaStream);
-        }).catch(this.handleLocalMediaStreamError);
+        }).catch(VideoHelper.handleLocalMediaStreamError);
 
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
@@ -64,7 +63,7 @@ class VideoChat extends Component {
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
                     console.log('remote description set');
                     this.createAnswer(localMediaStream);
-                }).catch(this.error);
+                }).catch(VideoHelper.error);
 
             }
             else if (on['answerMade']) {
@@ -74,7 +73,7 @@ class VideoChat extends Component {
                     console.log('remote description set')
                     this.localRef.current.srcObject = localMediaStream;
                     this.setState({ peerConnected: true });
-                }).catch(this.error);
+                }).catch(VideoHelper.error);
             }
             else if (on['candidate']) {
                 console.log(`adding ${on['candidate'].length} candidates`);
@@ -98,19 +97,6 @@ class VideoChat extends Component {
         this.remoteRef.current.srcObject = event.streams[0];
     }
 
-    // Handles error by logging a message to the console with the error message.
-    handleLocalMediaStreamError = (error) => {
-        console.log('navigator.getUserMedia error: ', error);
-        notification.error({
-            message: error.toString(),
-            description: 'Please allow access to camera and microphone',
-        })
-    }
-    
-    createOffer = () => {
-        VideoHelper.createOffer();
-    }
-
     createAnswer = (localMediaStream) => {
         console.log('answer');
         this.state.pc.createAnswer().then(sdp => {
@@ -118,8 +104,8 @@ class VideoChat extends Component {
                 this.state.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
                 this.localRef.current.srcObject = localMediaStream;
                 this.setState({ peerConnected: true });
-            }).catch(this.error)
-        }).catch(this.error);
+            }).catch(VideoHelper.error)
+        }).catch(VideoHelper.error);
     }
 
     toggleVideo = () => {
@@ -146,7 +132,7 @@ class VideoChat extends Component {
                 gotMediaDevice={gotMediaDevice}
                 toggleVideo={this.toggleVideo}
                 toggleAudio={this.toggleAudio}
-                createOffer={this.createOffer}
+                createOffer={VideoHelper.createOffer}
             />
         );
     }

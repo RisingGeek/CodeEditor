@@ -1,3 +1,4 @@
+import { notification } from 'antd'
 const helper = {
     candidates: [],
     pc: null,
@@ -57,6 +58,13 @@ const helper = {
     },
     error: (err) => {
         console.log('Error', err);
+    },
+    handleLocalMediaStreamError: (error) => {
+        console.log('navigator.getUserMedia error: ', error);
+        notification.error({
+            message: error.toString(),
+            description: 'Please allow access to camera and microphone',
+        })
     }
 }
 

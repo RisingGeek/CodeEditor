@@ -1,8 +1,11 @@
 class TextDiffBinding {
-  constructor(compoThis, doc, path) {
+  constructor(compoThis, doc, path, localPresence) {
     this.compoThis = compoThis || null;
     this.doc = doc;
     this.path = path || [];
+    this.localPresence = localPresence;
+    this.decorations = [];
+    this.range = null;
   }
 
   onInput = (newValue, e) => {
@@ -116,18 +119,17 @@ class TextDiffBinding {
     let value = this.doc.data[this.path[0]];
     this.compoThis.setState({ code: value }, () => {
       // Update peer cursor
-      if (this.compoThis.state.range) {
-        let range = this.compoThis.state.range;
-        let isPos = range.startLineNumber === range.endLineNumber &&
-          range.startColumn === range.endColumn;
-        let decorations = this.compoThis.state.editor.deltaDecorations(this.compoThis.state.decorations, [
+      if (this.range) {
+        // let range = this.compoThis.state.range;
+        let isPos = this.range.startLineNumber === this.range.endLineNumber &&
+          this.range.startColumn === this.range.endColumn;
+        this.decorations = this.compoThis.state.editor.deltaDecorations(this.decorations, [
           {
-            range: new this.compoThis.state.monaco.Range(range.startLineNumber, range.startColumn,
-              range.endLineNumber, range.endColumn),
+            range: new this.compoThis.state.monaco.Range(this.range.startLineNumber, 
+              this.range.startColumn,this.range.endLineNumber, this.range.endColumn),
             options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
           }
         ]);
-        this.compoThis.setState({ decorations: decorations });
       }
     });
   };

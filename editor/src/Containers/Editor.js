@@ -23,11 +23,8 @@ class Editor extends Component {
             editor: null,
             monaco: null,
             binding: null,
-            localPresence: null,
             videoChat: false,
             runCodeDisabled: false,
-            decorations: [],
-            range: null,
         }
     }
 
@@ -50,11 +47,14 @@ class Editor extends Component {
                 });
                 let localPresence = presence.create();
 
+                let binding = new StringBinding(this, doc, ['content'], localPresence);
+                binding.setup(this);
+
                 presence.on('receive', (id, range) => {
                     if (!range) return;
                     let isPos = range.startLineNumber === range.endLineNumber &&
                         range.startColumn === range.endColumn;
-                    let decorations = this.state.editor.deltaDecorations(this.state.decorations, [
+                    binding.decorations = this.state.editor.deltaDecorations(binding.decorations, [
                         {
                             range: new this.state.monaco.Range(range.startLineNumber, range.startColumn,
                                 range.endLineNumber, range.endColumn),
@@ -62,13 +62,12 @@ class Editor extends Component {
                         }
                     ]);
                     // console.log(this.state.editor.getModel().getAllDecorations())
-                    this.setState({ decorations: decorations, range: range })
+                    binding.range = range;
                 });
 
 
-                let binding = new StringBinding(this, doc, ['content']);
-                binding.setup(this);
-                this.setState({ binding, localPresence: localPresence });
+
+                this.setState({ binding });
             });
         }).catch(err => {
             console.log(err)
@@ -93,8 +92,8 @@ class Editor extends Component {
                 return;
             }
             // console.log(e);
-            if (this.state.localPresence) {
-                this.state.localPresence.submit(e.selection, err => {
+            if (this.state.binding.localPresence) {
+                this.state.binding.localPresence.submit(e.selection, err => {
                     if (err) throw err;
                 });
             }
@@ -129,7 +128,7 @@ class Editor extends Component {
                 notification.error({
                     message: err.toString(),
                 });
-                this.setState({runCodeDisabled: false});
+                this.setState({ runCodeDisabled: false });
             }
             else if (err.response.status === 400) {
                 this.state.binding._inoutListener(this.state.output, err.response.data, 'output');
