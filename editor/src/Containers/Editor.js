@@ -5,7 +5,7 @@ import axios from 'axios';
 import ReconnectingWebSocket from 'reconnecting-websocket';
 import shareDB from 'sharedb/lib/client';
 import StringBinding from '../EditorBinding/StringBinding';
-import {  notification } from 'antd';
+import { notification } from 'antd';
 
 const serverURL = process.env.REACT_APP_SERVER_URL;
 const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
@@ -23,6 +23,7 @@ class Editor extends Component {
             binding: null,
             videoChat: false,
             runCodeDisabled: false,
+            videoSocket: null,
         }
     }
 
@@ -34,6 +35,13 @@ class Editor extends Component {
             //open websocket connection to shareDB server
             const rws = new ReconnectingWebSocket(websocketURL + '/bar');
             const connection = new shareDB.Connection(rws);
+
+            // Open video socket
+            const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
+            videoSocket.addEventListener('open', event => {
+                console.log('connected to video server')
+            });
+
             //create local doc instance mapped to 'examples' collection document with id 'textarea'
             const doc = connection.get('examples', id);
 
@@ -65,7 +73,7 @@ class Editor extends Component {
 
 
 
-                this.setState({ binding });
+                this.setState({ binding, videoSocket });
             });
         }).catch(err => {
             console.log(err)
@@ -146,11 +154,14 @@ class Editor extends Component {
     }
 
     handleVideoChat = () => {
+        if (this.state.videoChat) {
+            this.state.videoSocket.send(JSON.stringify({ endCall: true }));
+        }
         this.setState({ videoChat: !this.state.videoChat });
     }
 
     render() {
-        const { videoChat, lang, code, input, output, runCodeDisabled } = this.state;
+        const { videoChat, lang, code, input, output, runCodeDisabled, videoSocket } = this.state;
         return (
             <EditorComponent
                 videoChat={videoChat}
@@ -159,8 +170,9 @@ class Editor extends Component {
                 input={input}
                 output={output}
                 runCodeDisabled={runCodeDisabled}
+                videoSocket={videoSocket}
                 handleVideoChat={this.handleVideoChat}
-                editorDidMount={this, this.editorDidMount}
+                editorDidMount={this.editorDidMount}
                 editorOnChange={this.editorOnChange}
                 handleLang={this.handleLang}
                 handleRun={this.handleRun}

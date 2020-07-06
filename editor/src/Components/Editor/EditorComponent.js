@@ -13,6 +13,7 @@ const EditorComponent = props => {
         input,
         output,
         runCodeDisabled,
+        videoSocket,
         handleVideoChat,
         editorDidMount,
         editorOnChange,
@@ -31,6 +32,7 @@ const EditorComponent = props => {
             <Col lg={20} sm={16}>
                 {videoChat && <VideoChat
                     videoChat={videoChat}
+                    videoSocket={videoSocket}
                     handleVideoChat={handleVideoChat}
                 />}
                 <div className={styles.editor}>
@@ -54,6 +56,7 @@ const EditorComponent = props => {
                     videoChat={videoChat}
                     runCodeDisabled={runCodeDisabled}
                     lang={lang}
+                    videoSocket={videoSocket}
                     handleLang={handleLang}
                     handleRun={handleRun}
                     handleInput={handleInput}

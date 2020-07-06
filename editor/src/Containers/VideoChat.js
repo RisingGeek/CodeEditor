@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
-import ReconnectingWebSocket from 'reconnecting-websocket';
 import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
 import VideoHelper from './VideoHelper';
-
-const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
 class VideoChat extends Component {
     constructor(props) {
@@ -13,7 +10,6 @@ class VideoChat extends Component {
         this.draggableRef = React.createRef();
 
         this.state = {
-            videoSocket: null,
             pc: null,
             controls: {
                 video: true,
@@ -25,13 +21,7 @@ class VideoChat extends Component {
     }
 
     componentDidMount() {
-        const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
-
-        videoSocket.addEventListener('open', event => {
-            console.log('connected to video server')
-        });
-
-        let pc = VideoHelper.peerConnectionInit(videoSocket);
+        let pc = VideoHelper.peerConnectionInit(this.props.videoSocket);
         pc.ontrack = this.addTrack;
 
         const mediaStreamConstraints = {
@@ -43,7 +33,7 @@ class VideoChat extends Component {
         let localMediaStream = null;
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
-            this.setState({ videoSocket, pc, gotMediaDevice: true });
+            this.setState({ pc, gotMediaDevice: true });
 
             // this.localRef.current.srcObject = mediaStream;
             this.remoteRef.current.srcObject = mediaStream;
@@ -55,7 +45,7 @@ class VideoChat extends Component {
             // pc.addStream(mediaStream);
         }).catch(VideoHelper.handleLocalMediaStreamError);
 
-        videoSocket.addEventListener('message', event => {
+        this.props.videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
                 console.log('offer made');
@@ -79,6 +69,9 @@ class VideoChat extends Component {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
             }
+            else if(on['endCall']) {
+                this.props.handleVideoChat();                
+            }
         });
 
     }
@@ -89,7 +82,6 @@ class VideoChat extends Component {
         if (this.remoteRef.current.srcObject)
             this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
         this.state.pc.close();
-        this.state.videoSocket.close();
     }
 
     addTrack = event => {
@@ -101,7 +93,7 @@ class VideoChat extends Component {
         console.log('answer');
         this.state.pc.createAnswer().then(sdp => {
             this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
-                this.state.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
+                this.props.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
                 this.localRef.current.srcObject = localMediaStream;
                 this.setState({ peerConnected: true });
             }).catch(VideoHelper.error)
