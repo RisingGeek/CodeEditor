@@ -6,7 +6,7 @@ const HomeComponent = props => {
     const { createId } = props;
     return (
         <div className={styles.home}>
-            <h1>PeerShare</h1>
+            <h1>Peer Share</h1>
             <p className={styles.heading}>Pair programming with peers</p>
             <p className={styles.description}>An online code editor for pair programming, interviews, teaching and much more...</p>
             <Link to={`/${createId()}`}>

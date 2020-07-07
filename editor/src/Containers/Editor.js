@@ -35,13 +35,6 @@ class Editor extends Component {
             //open websocket connection to shareDB server
             const rws = new ReconnectingWebSocket(websocketURL + '/bar');
             const connection = new shareDB.Connection(rws);
-
-            // Open video socket
-            const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
-            videoSocket.addEventListener('open', event => {
-                console.log('connected to video server')
-            });
-
             //create local doc instance mapped to 'examples' collection document with id 'textarea'
             const doc = connection.get('examples', id);
 
@@ -73,7 +66,7 @@ class Editor extends Component {
 
 
 
-                this.setState({ binding, videoSocket });
+                this.setState({ binding });
             });
         }).catch(err => {
             console.log(err)
@@ -154,10 +147,13 @@ class Editor extends Component {
     }
 
     handleVideoChat = () => {
-        if (this.state.videoChat) {
+        if (this.state.videoChat)
             this.state.videoSocket.send(JSON.stringify({ endCall: true }));
-        }
         this.setState({ videoChat: !this.state.videoChat });
+    }
+
+    handleVideoSocket = videoSocket => {
+        this.setState({ videoSocket });
     }
 
     render() {
@@ -177,6 +173,7 @@ class Editor extends Component {
                 handleLang={this.handleLang}
                 handleRun={this.handleRun}
                 handleInput={this.handleInput}
+                handleVideoSocket={this.handleVideoSocket}
             />
         );
     }

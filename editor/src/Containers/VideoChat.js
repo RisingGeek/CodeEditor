@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
+import ReconnectingWebSocket from 'reconnecting-websocket';
 import VideoChatComponent from '../Components/VideoChat/videoChatComponent';
 import VideoHelper from './VideoHelper';
+
+const websocketURL = process.env.REACT_APP_WEB_SOCKET_URL;
 
 class VideoChat extends Component {
     constructor(props) {
@@ -21,7 +24,13 @@ class VideoChat extends Component {
     }
 
     componentDidMount() {
-        let pc = VideoHelper.peerConnectionInit(this.props.videoSocket);
+        const videoSocket = new ReconnectingWebSocket(websocketURL + '/foo');
+
+        videoSocket.addEventListener('open', event => {
+            console.log('connected to video server')
+        });
+
+        let pc = VideoHelper.peerConnectionInit(videoSocket);
         pc.ontrack = this.addTrack;
 
         const mediaStreamConstraints = {
@@ -33,6 +42,7 @@ class VideoChat extends Component {
         let localMediaStream = null;
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
+            this.props.handleVideoSocket(videoSocket);
             this.setState({ pc, gotMediaDevice: true });
 
             // this.localRef.current.srcObject = mediaStream;
@@ -45,7 +55,7 @@ class VideoChat extends Component {
             // pc.addStream(mediaStream);
         }).catch(VideoHelper.handleLocalMediaStreamError);
 
-        this.props.videoSocket.addEventListener('message', event => {
+        videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
                 console.log('offer made');
@@ -70,7 +80,8 @@ class VideoChat extends Component {
                 on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
             }
             else if(on['endCall']) {
-                this.props.handleVideoChat();                
+                console.log('end call')
+                this.props.handleVideoChat();
             }
         });
 
@@ -82,6 +93,7 @@ class VideoChat extends Component {
         if (this.remoteRef.current.srcObject)
             this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
         this.state.pc.close();
+        this.props.videoSocket.close();
     }
 
     addTrack = event => {

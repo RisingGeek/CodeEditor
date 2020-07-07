@@ -19,7 +19,8 @@ const EditorComponent = props => {
         editorOnChange,
         handleLang,
         handleRun,
-        handleInput
+        handleInput,
+        handleVideoSocket
     } = props;
     const options = {
         selectOnLineNumbers: true, // Select line by clicking on line number
@@ -34,6 +35,7 @@ const EditorComponent = props => {
                     videoChat={videoChat}
                     videoSocket={videoSocket}
                     handleVideoChat={handleVideoChat}
+                    handleVideoSocket={handleVideoSocket}
                 />}
                 <div className={styles.editor}>
                     <MonacoEditor
