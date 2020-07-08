@@ -62,7 +62,7 @@ const SideDrawer = props => {
             onClick={handleRun} 
             disabled={runCodeDisabled}
             >
-                {runCodeDisabled ? "Loading..." : "Run Code"}
+                {runCodeDisabled ? "Running..." : "Run Code"}
             </button>
         </div>
     );
