@@ -20,6 +20,7 @@ class VideoChat extends Component {
             },
             peerConnected: false,
             gotMediaDevice: false,
+            connecting: false,
         }
     }
 
@@ -72,14 +73,14 @@ class VideoChat extends Component {
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
                     console.log('remote description set')
                     this.localRef.current.srcObject = localMediaStream;
-                    this.setState({ peerConnected: true });
+                    this.setState({ peerConnected: true, connecting: false });
                 }).catch(VideoHelper.error);
             }
             else if (on['candidate']) {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
             }
-            else if(on['endCall']) {
+            else if (on['endCall']) {
                 console.log('end call')
                 this.props.handleVideoChat();
             }
@@ -124,6 +125,11 @@ class VideoChat extends Component {
         this.setState({ controls: { ...this.state.controls, audio: !controls.audio } });
     }
 
+    createOffer = () => {
+        this.setState({ connecting: true });
+        VideoHelper.createOffer();
+    }
+
     render() {
         const { controls, peerConnected, gotMediaDevice } = this.state;
         return (
@@ -134,9 +140,10 @@ class VideoChat extends Component {
                 peerConnected={peerConnected}
                 controls={controls}
                 gotMediaDevice={gotMediaDevice}
+                connecting={this.state.connecting}
                 toggleVideo={this.toggleVideo}
                 toggleAudio={this.toggleAudio}
-                createOffer={VideoHelper.createOffer}
+                createOffer={this.createOffer}
             />
         );
     }
