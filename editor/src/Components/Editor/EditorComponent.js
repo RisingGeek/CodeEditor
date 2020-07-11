@@ -9,7 +9,6 @@ const EditorComponent = props => {
     const {
         videoChat,
         lang,
-        code,
         input,
         output,
         runCodeDisabled,
@@ -44,7 +43,6 @@ const EditorComponent = props => {
                         automaticLayout={true}
                         language={lang}
                         theme="vs-dark"
-                        value={code}
                         options={options}
                         editorDidMount={editorDidMount}
                         onChange={editorOnChange}

@@ -1,6 +1,5 @@
 class TextDiffBinding {
-  constructor(compoThis, doc, path, localPresence, editor, monaco) {
-    this.compoThis = compoThis || null;
+  constructor(doc, path, localPresence, editor, monaco, setCode, input, output) {
     this.doc = doc;
     this.path = path || [];
     this.localPresence = localPresence;
@@ -8,6 +7,9 @@ class TextDiffBinding {
     this.range = null;
     this.editor = editor;
     this.monaco = monaco;
+    this.setCode = setCode;
+    this.input = input;
+    this.output = output;
   }
 
   onInput = (newValue, e) => {
@@ -119,21 +121,23 @@ class TextDiffBinding {
 
   update = (isSetup) => {
     let value = this.doc.data[this.path[0]];
-    this.compoThis.setState({ code: value }, () => {
-      // Update peer cursor
-      if (this.range) {
-        // let range = this.compoThis.state.range;
-        let isPos = this.range.startLineNumber === this.range.endLineNumber &&
-          this.range.startColumn === this.range.endColumn;
-        this.decorations = this.editor.deltaDecorations(this.decorations, [
-          {
-            range: new this.monaco.Range(this.range.startLineNumber,
-              this.range.startColumn, this.range.endLineNumber, this.range.endColumn),
-            options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
-          }
-        ]);
-      }
-    });
+    this.editor.getModel().setValue(value);
+    // this.setCode(value);
+    // this.compoThis.setState({ code: value }, () => {
+    //   // Update peer cursor
+    //   if (this.range) {
+    //     // let range = this.compoThis.state.range;
+    //     let isPos = this.range.startLineNumber === this.range.endLineNumber &&
+    //       this.range.startColumn === this.range.endColumn;
+    //     this.decorations = this.editor.deltaDecorations(this.decorations, [
+    //       {
+    //         range: new this.monaco.Range(this.range.startLineNumber,
+    //           this.range.startColumn, this.range.endLineNumber, this.range.endColumn),
+    //         options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
+    //       }
+    //     ]);
+    //   }
+    // });
   };
 
 }

@@ -8,46 +8,52 @@ const helper = {
     binding: null,
     editor: null,
     monaco: null,
-    subscribeDoc: (url, id, editorThis, socketURL) => {
-        axios.post(url, {
-            id
-        }).then(res => {
-            //open websocket connection to shareDB server
-            const rws = new ReconnectingWebSocket(socketURL + '/bar');
-            const connection = new ShareDB.Connection(rws);
-            //create local doc instance mapped to 'examples' collection document with id 'textarea'
-            const doc = connection.get('examples', id);
+    doc: null,
+    subscribeDoc: (url, id, socketURL, input, output) => {
+        return new Promise((resolve, reject) => {
+            axios.post(url, {
+                id
+            }).then(res => {
+                //open websocket connection to shareDB server
+                const rws = new ReconnectingWebSocket(socketURL + '/bar');
+                const connection = new ShareDB.Connection(rws);
+                //create local doc instance mapped to 'examples' collection document with id 'textarea'
+                const doc = connection.get('examples', id);
+                helper.doc = doc;
 
-            doc.subscribe((err) => {
-                if (err) throw err;
-                const presence = connection.getPresence('examples');
-                presence.subscribe(err => {
+                doc.subscribe((err) => {
                     if (err) throw err;
-                });
-                let localPresence = presence.create();
+                    const presence = connection.getPresence('examples');
+                    presence.subscribe(err => {
+                        if (err) throw err;
+                    });
+                    let localPresence = presence.create();
 
-                helper.binding = new StringBinding(editorThis, doc, ['content'], localPresence, helper.editor, helper.monaco);
-                helper.binding.setup(editorThis);
+                    helper.binding = new StringBinding(doc, ['content'], localPresence, helper.editor, helper.monaco, input, output);
+                    helper.binding.setup();
 
-                presence.on('receive', (id, range) => {
-                    console.log('presence', range)
-                    if (!range) return;
-                    let isPos = range.startLineNumber === range.endLineNumber &&
-                        range.startColumn === range.endColumn;
-                    helper.binding.decorations = helper.editor.deltaDecorations(helper.binding.decorations, [
-                        {
-                            range: new helper.monaco.Range(range.startLineNumber, range.startColumn,
-                                range.endLineNumber, range.endColumn),
-                            options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
-                        }
-                    ]);
-                    helper.binding.range = range;
+                    presence.on('receive', (id, range) => {
+                        console.log('presence', range)
+                        if (!range) return;
+                        let isPos = range.startLineNumber === range.endLineNumber &&
+                            range.startColumn === range.endColumn;
+                        helper.binding.decorations = helper.editor.deltaDecorations(helper.binding.decorations, [
+                            {
+                                range: new helper.monaco.Range(range.startLineNumber, range.startColumn,
+                                    range.endLineNumber, range.endColumn),
+                                options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
+                            }
+                        ]);
+                        helper.binding.range = range;
+                    });
+                    resolve();
                 });
-            });
-        }).catch(err => {
-            console.log(err)
-            notification.error({
-                message: err.toString(),
+            }).catch(err => {
+                console.log(err)
+                notification.error({
+                    message: err.toString(),
+                });
+                reject();
             });
         });
     },
@@ -102,6 +108,9 @@ const helper = {
                 }
             })
         });
+    },
+    editorChange: value => {
+        helper.editor.getModel().setValue(value);
     }
 };
 
