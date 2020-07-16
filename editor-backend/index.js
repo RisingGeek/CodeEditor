@@ -31,6 +31,9 @@ const videoSocket = new WebSocket.Server({ noServer: true });
 const wss = new WebSocket.Server({ noServer: true });
 wss.on('connection', ws => {
     const stream = new WebSocketJSONStream(ws);
+    stream.on('error', error => {
+        console.log(error.message);
+    });
     share.listen(stream);
 });
 
