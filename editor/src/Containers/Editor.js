@@ -160,7 +160,7 @@ class Editor extends Component {
                 output={output}
                 runCodeDisabled={runCodeDisabled}
                 handleVideoChat={this.handleVideoChat}
-                editorDidMount={this, this.editorDidMount}
+                editorDidMount={this.editorDidMount}
                 editorOnChange={this.editorOnChange}
                 handleLang={this.handleLang}
                 handleRun={this.handleRun}
