@@ -13,6 +13,7 @@ class VideoChat extends Component {
         this.draggableRef = React.createRef();
 
         this.state = {
+            videoSocket: null,
             pc: null,
             controls: {
                 video: true,
@@ -43,8 +44,7 @@ class VideoChat extends Component {
         let localMediaStream = null;
         navigator.mediaDevices.getUserMedia(mediaStreamConstraints).then(mediaStream => {
             // Handles success by adding the MediaStream to the video element.
-            this.props.handleVideoSocket(videoSocket);
-            this.setState({ pc, gotMediaDevice: true });
+            this.setState({ videoSocket, pc, gotMediaDevice: true });
 
             // this.localRef.current.srcObject = mediaStream;
             this.remoteRef.current.srcObject = mediaStream;
@@ -59,6 +59,7 @@ class VideoChat extends Component {
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
+                this.setState({ connecting: true });
                 console.log('offer made');
                 // other person listens to offerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
@@ -73,16 +74,13 @@ class VideoChat extends Component {
                 pc.setRemoteDescription(new RTCSessionDescription(on['answerMade'].answer)).then(() => {
                     console.log('remote description set')
                     this.localRef.current.srcObject = localMediaStream;
-                    this.setState({ peerConnected: true, connecting: false });
+                    this.setState({ peerConnected: true });
                 }).catch(VideoHelper.error);
             }
             else if (on['candidate']) {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
-            }
-            else if (on['endCall']) {
-                console.log('end call')
-                this.props.handleVideoChat();
+                this.setState({ connecting: false });
             }
         });
 
@@ -94,7 +92,7 @@ class VideoChat extends Component {
         if (this.remoteRef.current.srcObject)
             this.remoteRef.current.srcObject.getTracks().forEach(track => track.stop());
         this.state.pc.close();
-        this.props.videoSocket.close();
+        this.state.videoSocket.close();
     }
 
     addTrack = event => {
@@ -102,11 +100,16 @@ class VideoChat extends Component {
         this.remoteRef.current.srcObject = event.streams[0];
     }
 
+    createOffer = () => {
+        this.setState({ connecting: true });
+        VideoHelper.createOffer();
+    }
+
     createAnswer = (localMediaStream) => {
         console.log('answer');
         this.state.pc.createAnswer().then(sdp => {
             this.state.pc.setLocalDescription(new RTCSessionDescription(sdp)).then(() => {
-                this.props.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
+                this.state.videoSocket.send(JSON.stringify({ makeAnswer: { answer: sdp } }));
                 this.localRef.current.srcObject = localMediaStream;
                 this.setState({ peerConnected: true });
             }).catch(VideoHelper.error)
@@ -125,13 +128,8 @@ class VideoChat extends Component {
         this.setState({ controls: { ...this.state.controls, audio: !controls.audio } });
     }
 
-    createOffer = () => {
-        this.setState({ connecting: true });
-        VideoHelper.createOffer();
-    }
-
     render() {
-        const { controls, peerConnected, gotMediaDevice } = this.state;
+        const { controls, peerConnected, gotMediaDevice, connecting } = this.state;
         return (
             <VideoChatComponent
                 draggableRef={this.draggableRef}
@@ -140,7 +138,7 @@ class VideoChat extends Component {
                 peerConnected={peerConnected}
                 controls={controls}
                 gotMediaDevice={gotMediaDevice}
-                connecting={this.state.connecting}
+                connecting={connecting}
                 toggleVideo={this.toggleVideo}
                 toggleAudio={this.toggleAudio}
                 createOffer={this.createOffer}

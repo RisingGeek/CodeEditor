@@ -1,13 +1,11 @@
 class TextDiffBinding {
-  constructor(compoThis, doc, path, localPresence, editor, monaco) {
+  constructor(compoThis, doc, path, localPresence) {
     this.compoThis = compoThis || null;
     this.doc = doc;
     this.path = path || [];
     this.localPresence = localPresence;
     this.decorations = [];
     this.range = null;
-    this.editor = editor;
-    this.monaco = monaco;
   }
 
   onInput = (newValue, e) => {
@@ -96,7 +94,7 @@ class TextDiffBinding {
   }
 
   _transformSelectionAndUpdate = (rangeOffset, length, transformCursor) => {
-    let editor = this.editor;
+    let editor = this.compoThis.state.editor;
     let selection = editor.getSelection();
     let currStartOffset = editor.getModel().getOffsetAt({
       lineNumber: selection.startLineNumber,
@@ -109,7 +107,7 @@ class TextDiffBinding {
 
     let offset = transformCursor(rangeOffset, currStartOffset, currEndOffset, length);
     this.update();
-    editor.setSelection(new this.monaco.Range(
+    editor.setSelection(new this.compoThis.state.monaco.Range(
       editor.getModel().getPositionAt(offset.startOffset).lineNumber,
       editor.getModel().getPositionAt(offset.startOffset).column,
       editor.getModel().getPositionAt(offset.endOffset).lineNumber,
@@ -125,10 +123,10 @@ class TextDiffBinding {
         // let range = this.compoThis.state.range;
         let isPos = this.range.startLineNumber === this.range.endLineNumber &&
           this.range.startColumn === this.range.endColumn;
-        this.decorations = this.editor.deltaDecorations(this.decorations, [
+        this.decorations = this.compoThis.state.editor.deltaDecorations(this.decorations, [
           {
-            range: new this.monaco.Range(this.range.startLineNumber,
-              this.range.startColumn, this.range.endLineNumber, this.range.endColumn),
+            range: new this.compoThis.state.monaco.Range(this.range.startLineNumber, 
+              this.range.startColumn,this.range.endLineNumber, this.range.endColumn),
             options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
           }
         ]);

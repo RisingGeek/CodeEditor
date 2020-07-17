@@ -48,3 +48,11 @@
 .overlay h2 {
   color: white;
 }
+
+img {
+  width: 30px;
+}
+
+button {
+  cursor: pointer;
+}
