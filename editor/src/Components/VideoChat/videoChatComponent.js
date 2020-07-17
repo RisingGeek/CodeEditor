@@ -13,6 +13,7 @@ const VideoChatComponent = props => {
         toggleVideo,
         toggleAudio,
         createOffer,
+        connecting,
     } = props;
     return (
         <React.Fragment>
@@ -25,6 +26,10 @@ const VideoChatComponent = props => {
                             autoPlay={true}
                             muted={!peerConnected}>
                         </video>
+                        {connecting && <div className={styles.overlay}>
+                            <h2>Connecting...</h2>
+                        </div>
+                        }
                         <div className={styles.local}>
                             <video
                                 className={styles.localVideo}
@@ -37,13 +42,17 @@ const VideoChatComponent = props => {
                             <div className={styles.controls}>
                                 <Row>
                                     <Col span={12}>
-                                        <button className="btn_primary" onClick={toggleVideo}>
-                                            {controls.video ? "Video On" : "Video Off"}
+                                        <button onClick={toggleVideo}>
+                                            {controls.video ?
+                                                <img src="https://img.icons8.com/metro/26/000000/video-call.png" alt="Audio On" /> :
+                                                <img src="https://img.icons8.com/metro/26/000000/no-video.png" alt="Video Off" />}
                                         </button>
                                     </Col>
                                     <Col span={12}>
-                                        <button className="btn_primary" onClick={toggleAudio}>
-                                            {controls.audio ? "Audio On" : "Audio Off"}
+                                        <button onClick={toggleAudio}>
+                                            {controls.audio ?
+                                                <img src="https://img.icons8.com/ios-glyphs/26/000000/microphone.png" alt="Video On" /> :
+                                                <img src="https://img.icons8.com/ios-glyphs/30/000000/no-microphone.png" alt="Video Off" />}
                                         </button>
                                     </Col>
                                 </Row>

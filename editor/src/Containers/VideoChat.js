@@ -21,6 +21,7 @@ class VideoChat extends Component {
             },
             peerConnected: false,
             gotMediaDevice: false,
+            connecting: false,
         }
     }
 
@@ -58,6 +59,7 @@ class VideoChat extends Component {
         videoSocket.addEventListener('message', event => {
             const on = JSON.parse(event.data);
             if (on['offerMade']) {
+                this.setState({ connecting: true });
                 console.log('offer made');
                 // other person listens to offerMade
                 pc.setRemoteDescription(new RTCSessionDescription(on['offerMade'].offer)).then(() => {
@@ -78,6 +80,7 @@ class VideoChat extends Component {
             else if (on['candidate']) {
                 console.log(`adding ${on['candidate'].length} candidates`);
                 on['candidate'].map(candidate => VideoHelper.addIceCandidate(candidate));
+                this.setState({ connecting: false });
             }
         });
 
@@ -95,6 +98,11 @@ class VideoChat extends Component {
     addTrack = event => {
         console.log('connect to peer');
         this.remoteRef.current.srcObject = event.streams[0];
+    }
+
+    createOffer = () => {
+        this.setState({ connecting: true });
+        VideoHelper.createOffer();
     }
 
     createAnswer = (localMediaStream) => {
@@ -121,7 +129,7 @@ class VideoChat extends Component {
     }
 
     render() {
-        const { controls, peerConnected, gotMediaDevice } = this.state;
+        const { controls, peerConnected, gotMediaDevice, connecting } = this.state;
         return (
             <VideoChatComponent
                 draggableRef={this.draggableRef}
@@ -130,9 +138,10 @@ class VideoChat extends Component {
                 peerConnected={peerConnected}
                 controls={controls}
                 gotMediaDevice={gotMediaDevice}
+                connecting={connecting}
                 toggleVideo={this.toggleVideo}
                 toggleAudio={this.toggleAudio}
-                createOffer={VideoHelper.createOffer}
+                createOffer={this.createOffer}
             />
         );
     }
