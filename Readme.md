@@ -1,6 +1,11 @@
 # Code Pair
 Code Pair is a clone of [HackerRank's CodePair](https://www.hackerrank.com/products/codepair/) platform. It provides an interactive Monaco Editor to write code and run it against a custom testcase. Users can edit code in realtime, similar to what Google docs provide.
 
+## Demo link: [https://codepair.netlify.app/](https://codepair.netlify.app/)
+
+## Demo Video: 
+![Video not available](https://j.gifs.com/ANGoVl.gif)
+
 ## Run Locally
 ### Frontend:
 `cd editor && npm start`
@@ -37,10 +42,10 @@ This project doesn't use any external plugins for video calling. Instead, it use
    - **Run code:** Run code against a custom test case in currently supported languages.
    - **Private Channel:** Only the users who have access to the unique URL can edit in the editor.
    - **Video Calling:** Users can interact via video calling.
+   - **Rich text presence:** Highlight the cursor position of other user.
 
 ## Features ToDo List 
    - **Support for more languages:** Code pair currently supports C++, Java and Python.
-   - **Rich text presence:** Highlight the cursor position of other user.
    - **Select questions from HackerRank and run all test cases:** Users can select questions from HackerRank and run all test cases against it (Maybe HackerRank provides an API for running all test cases).
    - **Proctoring control:** Detect when any user leaves the tab.
    
