@@ -122,22 +122,19 @@ class TextDiffBinding {
   update = (isSetup) => {
     let value = this.doc.data[this.path[0]];
     this.editor.getModel().setValue(value);
-    // this.setCode(value);
-    // this.compoThis.setState({ code: value }, () => {
     //   // Update peer cursor
-    //   if (this.range) {
-    //     // let range = this.compoThis.state.range;
-    //     let isPos = this.range.startLineNumber === this.range.endLineNumber &&
-    //       this.range.startColumn === this.range.endColumn;
-    //     this.decorations = this.editor.deltaDecorations(this.decorations, [
-    //       {
-    //         range: new this.monaco.Range(this.range.startLineNumber,
-    //           this.range.startColumn, this.range.endLineNumber, this.range.endColumn),
-    //         options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
-    //       }
-    //     ]);
-    //   }
-    // });
+      if (this.range) {
+        // let range = this.compoThis.state.range;
+        let isPos = this.range.startLineNumber === this.range.endLineNumber &&
+          this.range.startColumn === this.range.endColumn;
+        this.decorations = this.editor.deltaDecorations(this.decorations, [
+          {
+            range: new this.monaco.Range(this.range.startLineNumber,
+              this.range.startColumn, this.range.endLineNumber, this.range.endColumn),
+            options: { className: isPos ? 'cursor-position' : 'cursor-selection' }
+          }
+        ]);
+      }
   };
 
 }
