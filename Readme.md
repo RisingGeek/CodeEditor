@@ -1,10 +1,10 @@
-# Code Pair
-Code Pair is a clone of [HackerRank's CodePair](https://www.hackerrank.com/products/codepair/) platform. It provides an interactive Monaco Editor to write code and run it against a custom testcase. Users can edit code in realtime, similar to what Google docs provide.
+# Peer Share
+Peer Share is a code pair platform where users can share an interactive editor and write code together. It has language support for C++, Java and python. This application is based on the concept of operational transformation which forms the basis for a shared editor. Video calling is also provided within this application. It has some similar features as provided by [HackerRank's CodePair](https://www.hackerrank.com/products/codepair/) platform.
 
-## Demo link: [https://codepair.netlify.app/](https://codepair.netlify.app/)
+### Demo link: [https://codepair.netlify.app/](https://codepair.netlify.app/)
 
-## Demo Video: 
-![Video not available](https://j.gifs.com/ANGoVl.gif)
+### Demo Video: 
+[![Video not available](https://img.youtube.com/vi/jDBPh7Id1TU/hqdefault.jpg)](https://www.youtube.com/watch?v=jDBPh7Id1TU)
 
 ## Run Locally
 ### Frontend:
