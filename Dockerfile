@@ -8,6 +8,7 @@ RUN apt-get install npm -y
 RUN apt-get update && \
     apt-get -y install gcc mono-mcs && \
     rm -rf /var/lib/apt/lists/*
+RUN 6
 RUN apt-get update && apt-get install default-jre -y
 RUN apt-get update && apt-get install default-jdk -y
 RUN apt-get update && apt-get install python2 -y
