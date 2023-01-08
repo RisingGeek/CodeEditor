@@ -1,0 +1,30 @@
+# flyctl launch added from editor/.gitignore
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+editor/node_modules
+editor/.pnp
+editor/**/.pnp.js
+
+# testing
+editor/coverage
+
+# production
+editor/build
+
+# misc
+editor/**/.DS_Store
+editor/**/.env.local
+editor/**/.env.development.local
+editor/**/.env.test.local
+editor/**/.env.production.local
+editor/**/.env
+
+editor/**/npm-debug.log*
+editor/**/yarn-debug.log*
+editor/**/yarn-error.log*
+
+# flyctl launch added from editor-backend/.gitignore
+# dependencies
+editor-backend/node_modules
+fly.toml

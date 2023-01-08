@@ -4,7 +4,7 @@ const codeRunRouter = require('./Routes/codeRun');
 const cors = require('cors');
 const url = require('url');
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // shareDB is a realtime db backend based on operational transformation(OT).
 // Realtime synchronization of JSON document
